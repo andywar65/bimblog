@@ -9,11 +9,28 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from .models import Building
-#from .forms import ( ProjectStationCreateForm, StationImageCreateForm,
-    #ProjectMapDxfCreateForm)
+from .forms import ( BuildingCreateForm, )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
     permission_required = 'bimblog.view_building'
     context_object_name = 'builds'
     paginate_by = 12
+
+class BuildingCreateView( PermissionRequiredMixin, CreateView ):
+    model = Building
+    permission_required = 'portfolio.add_building'
+    form_class = BuildingCreateForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #we add the following to feed the map
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return reverse('bimblog:building_create')
+        else:
+            return reverse('bimblog:building_list')
