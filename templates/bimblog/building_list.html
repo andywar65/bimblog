@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ website.acro }} | {% translate "Buildings" %}{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-8">
+    <h4><strong>{% translate "List of buildings" %}</strong></h4>
+  </div>
+  <div class="col col-md-4 text-right">
+    {% if perms.bimblog.add_building %}
+      <a class="btn btn-secondary" href="/admin/bimblog/building/add/">{% translate "Add building" %}</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if builds %}
+  <hr class="mb-4">
+  {% include 'bimblog/building_list_loop.html' %}
+{% else %}
+<p>{% translate "There are no buildings available" %}</p>
+{% endif %}
+{% if is_paginated %}
+<nav aria-label="Page navigation container">
+<ul class="pagination justify-content-center">
+  {% if page_obj.has_previous %}
+  <li><a href="?page={{ page_obj.previous_page_number }}" class="page-link">&laquo; {% translate "PREVIOUS" %} </a></li>
+  {% endif %}
+  {% if page_obj.has_next %}
+  <li><a href="?page={{ page_obj.next_page_number }}" class="page-link"> {% translate "NEXT" %} &raquo;</a></li>
+  {% endif %}
+</ul>
+</nav>
+{% endif %}{% endblock content %}
