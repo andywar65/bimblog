@@ -59,6 +59,9 @@ class Building(models.Model):
             self.slug = generate_unique_slug(Building, self.title)
         self.last_updated = now()
         super(Building, self).save(*args, **kwargs)
+        if self.image and not self.fb_image:
+            #save with filebrowser image, sloppy workaround to make working test
+            Building.objects.filter(id=self.id).update(fb_image=FileObject(str(self.image)))
 
     class Meta:
         verbose_name = _('Building')

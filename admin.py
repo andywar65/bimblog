@@ -10,6 +10,9 @@ class BuildingAdmin(admin.ModelAdmin):
     #inlines = [ GalleryImageInline,  ]
 
     fieldsets = (
+        (_('Image'), {
+            'fields': ('fb_image', ),
+        }),
         (None, {
             'fields': ('title', 'date', 'intro', 'address'),
         }),
