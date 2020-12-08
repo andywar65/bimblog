@@ -17,8 +17,14 @@
 {% block content %}
 <div class="row">
   <div class="col col-md-8">
+    {% include "bimblog/buildingplan_alerts.html" %}
     <h4><strong>{% translate "Building" %}: {{ build.title }}
     </strong></h4>
+  </div>
+  <div class="col col-md-4 text-right">
+    {% if perms.bimblog.add_buildingplan %}
+      <a class="btn btn-secondary" href="{% url 'bimblog:buildingplan_create' slug=build.slug %}">{% translate "Add building plan" %}</a>
+    {% endif %}
   </div>
 </div>
 <hr class="mb-4">

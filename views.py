@@ -9,8 +9,9 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from .models import Building
-from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,)
+from .models import Building, BuildingPlan
+from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
+    BuildingPlanCreateForm, )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -36,6 +37,8 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if 'plan_created' in self.request.GET:
+            context['plan_created'] = self.request.GET['plan_created']
         #we add the following to feed the map
         context['mapbox_token'] = settings.MAPBOX_TOKEN
         return context
@@ -106,3 +109,33 @@ class BuildingDeleteView(PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse('bimblog:building_list') + f'?deleted={self.build.title}'
+
+class BuildingPlanCreateView( PermissionRequiredMixin, CreateView ):
+    model = BuildingPlan
+    permission_required = 'bimblog.add_buildingplan'
+    form_class = BuildingPlanCreateForm
+
+    def setup(self, request, *args, **kwargs):
+        super(BuildingPlanCreateView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building, slug = self.kwargs['slug'] )
+
+    def get_initial(self):
+        initial = super( BuildingPlanCreateView, self ).get_initial()
+        initial['build'] = self.build.id
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'plan_created' in self.request.GET:
+            context['plan_created'] = self.request.GET['plan_created']
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:buildingplan_create',
+                kwargs={'slug': self.build.slug}) +
+                f'?plan_created={self.object.title}')
+        else:
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug}) +
+                f'?plan_created={self.object.title}')
