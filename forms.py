@@ -30,3 +30,8 @@ class BuildingPlanCreateForm(ModelForm):
     class Meta:
         model = BuildingPlan
         fields = '__all__'
+
+class BuildingPlanDeleteForm(forms.Form):
+    delete = forms.BooleanField( label=_("Delete the building plan"),
+        required = True,
+        help_text = _("""Caution, can't undo this."""))

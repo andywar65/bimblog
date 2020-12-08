@@ -88,7 +88,7 @@ class BuildingPlan(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(BuildingPlan,
-                self.build.title + ' ' + self.title + ' ' + str(self.elev))
+                self.title + ' ' + str(self.elev))
         #upload file
         super(BuildingPlan, self).save(*args, **kwargs)
         self.geometry = workflow(self.file, self.build.lat, self.build.long)

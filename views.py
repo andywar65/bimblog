@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 
 from .models import Building, BuildingPlan
 from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
-    BuildingPlanCreateForm, )
+    BuildingPlanCreateForm, BuildingPlanDeleteForm, )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -153,8 +153,10 @@ class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
     slug_url_kwarg = 'plan_slug'
 
     def get_object(self, queryset=None):
+        #elsewhere we get the parent in setup, but here we also need object
         plan = super(BuildingPlanUpdateView, self).get_object(queryset=None)
-        self.build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['build_slug'] )
         if not self.build == plan.build:
             raise Http404(_("Plan does not belong to Building"))
         return plan
@@ -174,3 +176,32 @@ class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
             return (reverse('bimblog:building_detail',
                 kwargs={'slug': self.build.slug}) +
                 f'?plan_modified={self.object.title}')
+
+class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
+    model = BuildingPlan
+    permission_required = 'bimblog.delete_buildingplan'
+    form_class = BuildingPlanDeleteForm
+    template_name = 'bimblog/buildingplan_delete_form.html'
+
+    def setup(self, request, *args, **kwargs):
+        super(BuildingPlanDeleteView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['build_slug'] )
+        self.plan = get_object_or_404( BuildingPlan,
+            slug = self.kwargs['plan_slug'] )
+        if not self.build == self.plan.build:
+            raise Http404(_("Plan does not belong to Building"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.plan.title
+        return context
+
+    def form_valid(self, form):
+        self.plan.delete()
+        return super(BuildingPlanDeleteView, self).form_valid(form)
+
+    def get_success_url(self):
+        return (reverse('bimblog:building_detail',
+            kwargs={'slug': self.build.slug}) +
+            f'?plan_deleted={self.plan.title}')
