@@ -63,44 +63,12 @@ def parse_dxf(dxf_f):
         #stores values for all entities (with arbitrary axis algorithm)
         if flag == 'ent':
             d = store_entity_values(d, key, value)
-        #stores values for attributes within block
-        elif flag == 'attrib':
-            if key == '1':#attribute value
-                attr_value = html.escape(value, quote=True)
-            elif key == '2':#attribute key
-                d[value] = attr_value
-                flag = 'ent'#restore block modality
 
         if key == '0':
 
-            if value == 'ATTRIB':#start attribute within block
-                attr_value = ''
-                flag = 'attrib'
+            if flag == 'ent':#close all other entities
 
-            elif flag == 'ent':#close all other entities
-
-                    if d['ent'] == '3df':
-                        d['2'] = 'a-triangle'
-
-                        d['num'] = x
-                        collection[x] = d
-
-                        if (d['12']!=d['13'] or d['22']!=d['23'] or
-                            d['32']!=d['33']):
-                            d2 = d.copy()
-                            d2['11'] = d['12']
-                            d2['12'] = d['13']
-                            d2['21'] = d['22']
-                            d2['22'] = d['23']
-                            d2['31'] = d['32']
-                            d2['32'] = d['33']
-                            x += 1
-                            d2['num'] = x
-                            collection[x] = d2
-
-                        flag = False
-
-                    elif d['ent'] == 'poly':#close polyline
+                    if d['ent'] == 'poly':#close polyline
                         d['2'] = 'a-poly'
                         if d['210'] == 0 and d['220'] == 0:
                             d['10'] = d['vx'][0]
@@ -122,49 +90,7 @@ def parse_dxf(dxf_f):
                         collection[x] = d
                         flag = False
 
-                    elif d['ent'] == 'insert':
-                        if d['2'] == 'a-window':
-                            d['WMATERIAL'] = d['MATERIAL2'] = d['MATERIAL']
-                            #d['wpool'] = d['pool2'] = d['pool']
-                            d['TILING2'] = d['TILING'] = 0
-                            d['SKIRTING2'] = d['SKIRTING'] = 0
-                        elif d['2'] == 'a-wall' or d['2'] == 'a-mason':
-                            if d['MATERIAL2']:
-                                pass
-                                #try:
-                                    #d['pool2'] = page.material_dict[
-                                        #d['MATERIAL2']]
-                                #except:
-                                    #d['pool2'] = d['pool']
-                            else:
-                                d['MATERIAL2'] = d['MATERIAL']
-                                #d['pool2'] = d['pool']
-                                d['TILING2'] = d['TILING']
-                                d['SKIRTING2'] = d['SKIRTING']
-
-                        d['num'] = x
-                        collection[x] = d
-
-                        flag = False
-
-            if value == '3DFACE':#start 3D face
-                #default values
-                d = {'ID': '', '50': 0, '210': 0, '220': 0, '230': 1,
-                'PROPERTY': False, 'animation': False, 'RIG': False,}
-                flag = 'ent'
-                d['ent'] = '3df'
-                x += 1
-
-            elif value == 'INSERT':#start block
-                #default values
-                d = {'ID': '', '41': 1, '42': 1, '43': 1, '50': 0, '210': 0, '220': 0,
-                 '230': 1,'repeat': False, 'TYPE': '','NAME': '', 'RIG': False,
-                 'animation': False, 'PROPERTY': False, 'PART': '',}
-                flag = 'ent'
-                d['ent'] = 'insert'
-                x += 1
-
-            elif value == 'LINE':#start line
+            if value == 'LINE':#start line
                 d = {'ent': 'line', '30': 0, '31': 0, '39': 0, '41': 1, '42': 1, '43': 1,
                 '50': 0, '210': 0, '220': 0, '230': 1, }
                 flag = 'ent'
