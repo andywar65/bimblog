@@ -18,3 +18,7 @@ class BuildingUpdateForm(ModelForm):
         model = Building
         fields = ( 'title', 'intro', 'date', 'address', 'lat', 'long',
             'zoom')
+
+class BuildingDeleteForm(forms.Form):
+    delete = forms.BooleanField( label=_("Delete the building"), required = True,
+        help_text = _("""Caution, can't undo this."""))
