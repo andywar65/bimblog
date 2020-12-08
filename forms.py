@@ -11,3 +11,10 @@ class BuildingCreateForm(ModelForm):
         model = Building
         fields = ( 'image', 'title', 'intro', 'date', 'address', 'lat', 'long',
             'zoom')
+
+class BuildingUpdateForm(ModelForm):
+
+    class Meta:
+        model = Building
+        fields = ( 'title', 'intro', 'date', 'address', 'lat', 'long',
+            'zoom')

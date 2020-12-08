@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from .models import Building
-from .forms import ( BuildingCreateForm, )
+from .forms import ( BuildingCreateForm, BuildingUpdateForm,)
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -66,7 +66,7 @@ class BuildingCreateView( PermissionRequiredMixin, CreateView ):
 class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
     model = Building
     permission_required = 'bimblog.change_building'
-    form_class = BuildingCreateForm
+    form_class = BuildingUpdateForm
     template_name = 'bimblog/building_update_form.html'
 
     def get_context_data(self, **kwargs):
