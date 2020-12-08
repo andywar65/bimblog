@@ -39,6 +39,10 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         if 'plan_created' in self.request.GET:
             context['plan_created'] = self.request.GET['plan_created']
+        if 'plan_modified' in self.request.GET:
+            context['plan_modified'] = self.request.GET['plan_modified']
+        if 'plan_deleted' in self.request.GET:
+            context['plan_deleted'] = self.request.GET['plan_deleted']
         #we add the following to feed the map
         context['mapbox_token'] = settings.MAPBOX_TOKEN
         return context
@@ -139,3 +143,34 @@ class BuildingPlanCreateView( PermissionRequiredMixin, CreateView ):
             return (reverse('bimblog:building_detail',
                 kwargs={'slug': self.build.slug}) +
                 f'?plan_created={self.object.title}')
+
+class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
+    model = BuildingPlan
+    permission_required = 'bimblog.change_buildingplan'
+    form_class = BuildingPlanCreateForm
+    template_name = 'bimblog/buildingplan_update_form.html'
+    #we have two slugs, so we need to override next attribute
+    slug_url_kwarg = 'plan_slug'
+
+    def get_object(self, queryset=None):
+        plan = super(BuildingPlanUpdateView, self).get_object(queryset=None)
+        self.build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
+        if not self.build == plan.build:
+            raise Http404(_("Plan does not belong to Building"))
+        return plan
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'plan_modified' in self.request.GET:
+            context['plan_modified'] = self.request.GET['plan_modified']
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:buildingplan_create',
+                kwargs={'slug': self.build.slug}) +
+                f'?plan_modified={self.object.title}')
+        else:
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug}) +
+                f'?plan_modified={self.object.title}')

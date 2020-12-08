@@ -2,7 +2,8 @@ from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from .views import (BuildingListView, BuildingDetailView, BuildingCreateView,
-    BuildingUpdateView, BuildingDeleteView, BuildingPlanCreateView,)
+    BuildingUpdateView, BuildingDeleteView, BuildingPlanCreateView,
+    BuildingPlanUpdateView,)
 
 app_name = 'bimblog'
 urlpatterns = [
@@ -13,4 +14,6 @@ urlpatterns = [
     path('<slug>/delete/', BuildingDeleteView.as_view(), name = 'building_delete'),
     path('<slug>/plan/add/', BuildingPlanCreateView.as_view(),
         name = 'buildingplan_create'),
+    path('<slug:build_slug>/plan/<slug:plan_slug>/change/',
+        BuildingPlanUpdateView.as_view(), name = 'buildingplan_change'),
     ]
