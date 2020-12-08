@@ -1,13 +1,18 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
-from .models import Building
+from .models import Building, BuildingPlan
 #from pages.admin import GalleryImageInline
+
+class BuildingPlanInline(admin.TabularInline):
+    model = BuildingPlan
+    fields = ('title', 'elev', 'file')
+    extra = 0
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
     list_display = ('title', 'address', )
-    #inlines = [ GalleryImageInline,  ]
+    inlines = [ BuildingPlanInline,  ]
 
     fieldsets = (
         (_('Image'), {

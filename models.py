@@ -43,7 +43,7 @@ class Building(models.Model):
     long = models.FloatField(_("Longitude"), default = 12.5451,
         help_text=_("Coordinates from Google Maps or https://openstreetmap.org"))
     zoom = models.FloatField(_("Zoom factor"), default = 10,
-        help_text=_("Maximum should be 19"))
+        help_text=_("Maximum should be 21"))
 
 
     def __str__(self):
@@ -67,3 +67,30 @@ class Building(models.Model):
         verbose_name = _('Building')
         verbose_name_plural = _('Buildings')
         ordering = ('-date', )
+
+class BuildingPlan(models.Model):
+
+    build = models.ForeignKey(Building, on_delete = models.CASCADE,
+        related_name='building_plan', verbose_name = _('Building'))
+    title = models.CharField(_('Name'),
+        help_text=_("Name of the building plan"), max_length = 50, )
+    slug = models.SlugField(max_length=100, editable=False, null=True)
+    elev = models.FloatField(_("Elevation in meters"), default = 0)
+    file = models.FileField(_("DXF file"), max_length=200,
+        upload_to="uploads/buildings/plans/dxf/",
+        validators=[FileExtensionValidator(allowed_extensions=['dxf', ])])
+    geometry = models.JSONField( editable=False, null=True, blank=True )
+
+    def __str__(self):
+        return self.title + ' | ' + str(self.elev)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(BuildingPlan,
+                self.build.title + ' ' + self.title + ' ' + str(self.elev))
+        super(BuildingPlan, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = _('Building plan')
+        verbose_name_plural = _('Building plans')
+        ordering = ('-elev', )
