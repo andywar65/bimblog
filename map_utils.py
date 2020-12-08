@@ -165,23 +165,17 @@ def parse_dxf(dxf_f):
                 x += 1
 
             elif value == 'LINE':#start line
-                d = {'ID': '', '30': 0, '31': 0, '39': 0, '41': 1, '42': 1, '43': 1,
-                '50': 0, '210': 0, '220': 0, '230': 1, 'RIG': False,
-                'PROPERTY': False, 'animation': False, 'repeat': False,
-                'PART': '', 'TILING': 0, 'SKIRTING': 0}
+                d = {'ent': 'line', '30': 0, '31': 0, '39': 0, '41': 1, '42': 1, '43': 1,
+                '50': 0, '210': 0, '220': 0, '230': 1, }
                 flag = 'ent'
-                d['ent'] = 'line'
                 x += 1
 
             elif value == 'LWPOLYLINE':#start polyline
                 #default values
-                d = {'ID': '', '38': 0,  '39': 0, '41': 1, '42': 1,
+                d = {'ent': 'poly', '38': 0,  '39': 0, '41': 1, '42': 1,
                 '43': 1, '50': 0, '70': False, '210': 0, '220': 0, '230': 1,
-                'vx': [], 'vy': [], 'PROPERTY': False, 'RIG': False,
-                'animation': False, 'repeat': False,
-                'PART': '', 'TILING': 0, 'SKIRTING': 0}
+                'vx': [], 'vy': [], }
                 flag = 'ent'
-                d['ent'] = 'poly'
                 x += 1
 
             elif value == 'CIRCLE':#start circle
