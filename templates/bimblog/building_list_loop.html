@@ -6,7 +6,7 @@
 <div class="card" style="margin-bottom: 20px; min-width: 18rem;">
   <div class="card-header">
     <h4 class="card-title">
-    <a href="{# url 'bimblog:building_detail' slug=build.slug #}#">
+    <a href="{% url 'bimblog:building_detail' slug=build.slug %}">
       {{ build.title }}</a></h4>
   </div>
   {% if build.fb_image %}

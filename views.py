@@ -26,10 +26,18 @@ class BuildingListView(PermissionRequiredMixin, ListView):
 
         return context
 
-class BuildingDetailView(DetailView):
+class BuildingDetailView(PermissionRequiredMixin, DetailView):
     model = Building
+    permission_required = 'bimblog.view_building'
     context_object_name = 'build'
     slug_field = 'slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #we add the following to feed the map
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+
+        return context
 
 class BuildingCreateView( PermissionRequiredMixin, CreateView ):
     model = Building
