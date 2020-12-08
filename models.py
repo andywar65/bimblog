@@ -13,6 +13,7 @@ from filebrowser.fields import FileBrowseField
 from filebrowser.base import FileObject
 
 from project.utils import generate_unique_slug
+from .map_utils import workflow
 #from .choices import *
 #from .map_utils import workflow
 
@@ -88,6 +89,10 @@ class BuildingPlan(models.Model):
         if not self.slug:
             self.slug = generate_unique_slug(BuildingPlan,
                 self.build.title + ' ' + self.title + ' ' + str(self.elev))
+        #upload file
+        super(BuildingPlan, self).save(*args, **kwargs)
+        self.geometry = workflow(self.file, self.build.lat, self.build.long)
+        #save geometry
         super(BuildingPlan, self).save(*args, **kwargs)
 
     class Meta:
