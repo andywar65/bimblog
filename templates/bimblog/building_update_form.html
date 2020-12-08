@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{{ website.acro }} | {% translate "Modify building" %}{% endblock title %}
+
+{% block extra-head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+     crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+{% endblock extra-head %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    {% include "bimblog/building_alerts.html" %}
+    <h4><strong>{% translate "Modify building" %}</strong></h4>
+    {% if perms.bimblog.change_building %}
+    <div class="row">
+      <div class="col col-md-8">
+        {% blocktranslate with name=user.get_short_name %}
+          Hello {{ name }}, update the fields below then submit.
+        {% endblocktranslate %}
+      </div>
+      <div class="col col-md-4">
+        <a class="btn btn-danger" href="{% url 'invoices:delete' object.id %}">{% translate 'Delete' %}</a>
+      </div>
+    </div>
+    <hr class="mb-4">
+    {% if form.errors %}
+      <p class="alert alert-danger" role="alert">
+        {% translate 'Fix the errors below, please' %}.
+      </p>
+    {% endif %}
+    <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
+        {{ form|crispy }}
+        <hr class="mb-4">
+        <div class="row">
+          <div class="col" id="mapid" style="height: 480px;"></div>
+        </div>
+        <hr class="mb-4">
+          {% include "bimblog/add_buttons.html" %}
+        <hr class="mb-4">
+      {% csrf_token %}
+    </form>
+    {% else %}
+    {% translate "You don't have permissions to modify buildings" %}.
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+{% block extra-js %}
+<script type="text/javascript">
+  var mymap = L.map('mapid').setView([{{ object.lat|unlocalize }}, {{ object.long|unlocalize }}], {{ object.zoom|unlocalize }});
+
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 21,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: '{{ mapbox_token }}'
+  }).addTo(mymap);
+
+  function onMapClick(e) {
+    var inputlat = document.getElementById("id_lat");
+    var inputlong = document.getElementById("id_long");
+    var inputzoom = document.getElementById("id_zoom");
+    inputlat.setAttribute('value', e.latlng.lat);
+    inputlong.setAttribute('value', e.latlng.lng);
+    inputzoom.setAttribute('value', mymap.getZoom());
+  }
+
+  mymap.on('click', onMapClick);
+
+</script>
+{% endblock extra-js %}

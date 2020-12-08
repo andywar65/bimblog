@@ -35,7 +35,7 @@
       {% if perms.bimblog.change_building %}
       <li class="list-inline-item">
         <i class="fa fa-pencil" aria-hidden="true"></i>
-        <a href="/admin/bimblog/building/{{ build.id }}/change/">{% translate "Modify" %}</a>
+        <a href="{% url 'bimblog:building_change' slug=build.slug %}">{% translate "Modify" %}</a>
       </li>
       <li class="list-inline-item">
         <i class="fa fa-building-o" aria-hidden="true"></i>

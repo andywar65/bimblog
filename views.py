@@ -69,6 +69,13 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
     form_class = BuildingCreateForm
     template_name = 'bimblog/building_update_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #we add the following to feed the map
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+
+        return context
+
     def get_success_url(self):
         if 'add_another' in self.request.POST:
             return (reverse('bimblog:building_create') +
