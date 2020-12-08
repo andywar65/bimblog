@@ -101,7 +101,6 @@ class BuildingDeleteView(PermissionRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        self.title = self.build.title
         self.build.delete()
         return super(BuildingDeleteView, self).form_valid(form)
 
