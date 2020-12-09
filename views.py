@@ -37,11 +37,15 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'plan_created' in self.request.GET:
+        if 'created' in self.request.GET:
+            context['created'] = self.request.GET['created']
+        elif 'modified' in self.request.GET:
+            context['modified'] = self.request.GET['modified']
+        elif 'plan_created' in self.request.GET:
             context['plan_created'] = self.request.GET['plan_created']
-        if 'plan_modified' in self.request.GET:
+        elif 'plan_modified' in self.request.GET:
             context['plan_modified'] = self.request.GET['plan_modified']
-        if 'plan_deleted' in self.request.GET:
+        elif 'plan_deleted' in self.request.GET:
             context['plan_deleted'] = self.request.GET['plan_deleted']
         #we add the following to feed the map
         context['mapbox_token'] = settings.MAPBOX_TOKEN
@@ -72,7 +76,8 @@ class BuildingCreateView( PermissionRequiredMixin, CreateView ):
             return (reverse('bimblog:building_create') +
                 f'?created={self.object.title}')
         else:
-            return (reverse('bimblog:building_list') +
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.object.slug }) +
                 f'?created={self.object.title}')
 
 class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
@@ -92,7 +97,8 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
             return (reverse('bimblog:building_create') +
                 f'?modified={self.object.title}')
         else:
-            return (reverse('bimblog:building_list') +
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.object.slug }) +
                 f'?modified={self.object.title}')
 
 class BuildingDeleteView(PermissionRequiredMixin, FormView):
