@@ -84,7 +84,7 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
     model = Building
     permission_required = 'bimblog.change_building'
     form_class = BuildingUpdateForm
-    template_name = 'bimblog/building_update_form.html'
+    template_name = 'bimblog/building_form_update.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,7 +105,7 @@ class BuildingDeleteView(PermissionRequiredMixin, FormView):
     model = Building
     permission_required = 'bimblog.delete_building'
     form_class = BuildingDeleteForm
-    template_name = 'bimblog/building_delete_form.html'
+    template_name = 'bimblog/building_form_delete.html'
 
     def setup(self, request, *args, **kwargs):
         super(BuildingDeleteView, self).setup(request, *args, **kwargs)
@@ -157,7 +157,7 @@ class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
     model = BuildingPlan
     permission_required = 'bimblog.change_buildingplan'
     form_class = BuildingPlanCreateForm
-    template_name = 'bimblog/buildingplan_update_form.html'
+    template_name = 'bimblog/buildingplan_form_update.html'
     #we have two slugs, so we need to override next attribute
     slug_url_kwarg = 'plan_slug'
 
@@ -190,7 +190,7 @@ class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
     model = BuildingPlan
     permission_required = 'bimblog.delete_buildingplan'
     form_class = BuildingPlanDeleteForm
-    template_name = 'bimblog/buildingplan_delete_form.html'
+    template_name = 'bimblog/buildingplan_form_delete.html'
 
     def setup(self, request, *args, **kwargs):
         super(BuildingPlanDeleteView, self).setup(request, *args, **kwargs)
