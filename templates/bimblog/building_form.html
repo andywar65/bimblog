@@ -15,10 +15,10 @@
 {% endblock extra-head %}
 
 {% block content %}
+{% include "bimblog/building_alerts.html" %}
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
-    {% include "bimblog/building_alerts.html" %}
     <h4><strong>{% translate "Add building" %}</strong></h4>
     {% if perms.bimblog.add_building %}
     <p>{% blocktranslate with name=user.get_short_name %}

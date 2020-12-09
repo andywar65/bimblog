@@ -4,8 +4,8 @@
 {% block title %}{{ website.acro }} | {% translate "Buildings" %}{% endblock title %}
 
 {% block content %}
+{% include "bimblog/building_alerts.html" %}
 <div class="row">
-  {% include "bimblog/building_alerts.html" %}
   <div class="col col-md-8">
     <h4><strong>{% translate "List of buildings" %}</strong></h4>
   </div>
