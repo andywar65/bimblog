@@ -40,10 +40,10 @@ class Building(models.Model):
     address = models.CharField(_('Address'), null=True, blank=True,
         help_text = _('Something like "Rome - Monteverde" is ok'),
         max_length = 100)
-    lat = models.FloatField(_("Latitude"), default = 41.8988)
-    long = models.FloatField(_("Longitude"), default = 12.5451,
+    lat = models.FloatField(_("Latitude"), default = settings.CITY_LAT)
+    long = models.FloatField(_("Longitude"), default = settings.CITY_LONG,
         help_text=_("Coordinates from Google Maps or https://openstreetmap.org"))
-    zoom = models.FloatField(_("Zoom factor"), default = 10,
+    zoom = models.FloatField(_("Zoom factor"), default = settings.CITY_ZOOM,
         help_text=_("Maximum should be 21"))
 
 

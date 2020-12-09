@@ -61,6 +61,9 @@ class BuildingCreateView( PermissionRequiredMixin, CreateView ):
         elif 'deleted' in self.request.GET:
             context['deleted'] = self.request.GET['deleted']
         #we add the following to feed the map
+        context['city_lat'] = settings.CITY_LAT
+        context['city_long'] = settings.CITY_LONG
+        context['city_zoom'] = settings.CITY_ZOOM
         context['mapbox_token'] = settings.MAPBOX_TOKEN
         return context
 
