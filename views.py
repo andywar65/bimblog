@@ -42,6 +42,7 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['plans'] = context['build'].building_plan
         if 'created' in self.request.GET:
             context['created'] = self.request.GET['created']
         elif 'modified' in self.request.GET:

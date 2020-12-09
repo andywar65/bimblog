@@ -49,6 +49,16 @@
     <p><em>{{ build.intro }}</em></p>
   </div>
 </div>
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <img src="{% version build.fb_image 'landscape' %}" class="img-fluid" alt="{{ build.intro }}">
+    {% if plans.all %}
+      {% include 'bimblog/building_detail_plans.html' %}
+    {% endif %}
+  </div>
+</div>
+
 {% endblock content %}
 {% block extra-js %}
 <script type="text/javascript">
