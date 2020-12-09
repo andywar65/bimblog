@@ -147,6 +147,8 @@ class BuildingPlanCreateView( PermissionRequiredMixin, CreateView ):
         context = super().get_context_data(**kwargs)
         if 'plan_created' in self.request.GET:
             context['plan_created'] = self.request.GET['plan_created']
+        if 'plan_modified' in self.request.GET:
+            context['plan_modified'] = self.request.GET['plan_modified']
         return context
 
     def get_success_url(self):
@@ -175,12 +177,6 @@ class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
         if not self.build == plan.build:
             raise Http404(_("Plan does not belong to Building"))
         return plan
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'plan_modified' in self.request.GET:
-            context['plan_modified'] = self.request.GET['plan_modified']
-        return context
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
