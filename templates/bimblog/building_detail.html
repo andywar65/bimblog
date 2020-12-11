@@ -16,6 +16,7 @@
   <div class="col col-md-8">
     <h4><strong>{% translate "Building" %}: {{ build.title }}
     </strong></h4>
+    <p><em>{{ build.intro }}</em></p>
   </div>
   <div class="col col-md-4 text-right">
     {% if perms.bimblog.add_buildingplan %}
@@ -25,35 +26,24 @@
 </div>
 <hr class="mb-4">
 <div class="row">
-  <div class="col" id="mapid" style="height: 480px;"></div>
+  <div class="col" id="mapid" style="height: 600px; margin-bottom: 10px"></div>
 </div>
-<div class="row row-striped">
+<div class="row">
   <div class="col-md-2"></div>
-  <div class="col-md-8">
-    <ul class="list-inline">
-      <li class="list-inline-item">
-        <i class="fa fa-calendar-o" aria-hidden="true"></i> {{ build.date|date:"Y" }}
-      </li>
-      {% if perms.bimblog.change_building %}
-      <li class="list-inline-item">
-        <i class="fa fa-pencil" aria-hidden="true"></i>
-        <a href="{% url 'bimblog:building_change' slug=build.slug %}">{% translate "Modify" %}</a>
-      </li>
-      <li class="list-inline-item">
-        <i class="fa fa-building-o" aria-hidden="true"></i>
-        <a href="{% url 'bimblog:building_list' %}">{% translate "All buildings" %}</a>
-      </li>
-      {% endif %}
-    </ul>
-    <hr>
-    <p><em>{{ build.intro }}</em></p>
+  <div class="col-md-4">
+    {% if perms.bimblog.change_building %}
+      <a class="btn btn-primary" href="{% url 'bimblog:building_change' slug=build.slug %}">{% translate "Modify building" %}</a>
+    {% endif %}
+  </div>
+  <div class="col-md-4 text-right">
+    <a class="btn btn-secondary" href="{% url 'bimblog:building_list' %}">{% translate "Back to all buildings" %}</a>
   </div>
 </div>
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
-    <img src="{% version build.fb_image 'landscape' %}" class="img-fluid" alt="{{ build.intro }}">
     {% if plans.all %}
+      <hr class="mb-4">
       {% include 'bimblog/building_detail_plans.html' %}
     {% endif %}
   </div>
@@ -89,7 +79,7 @@
 
 
 
-  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("{{ build.title }}").addTo(mymap);
+  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
 
   var baseMaps = {
     "Base": base_map
