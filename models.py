@@ -85,6 +85,9 @@ class BuildingPlan(models.Model):
     def __str__(self):
         return self.title + ' | ' + str(self.elev)
 
+    def uslug(self):
+        return self.slug.replace('-', '_')
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(BuildingPlan,
