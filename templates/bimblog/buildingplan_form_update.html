@@ -18,7 +18,7 @@
           Hello {{ name }}, update the fields below then submit.
         {% endblocktranslate %}
       </div>
-      <div class="col col-md-4">
+      <div class="col col-md-4 text-right">
         <a class="btn btn-danger" href="{% url 'bimblog:buildingplan_delete' build_slug=object.build.slug plan_slug=object.slug %}">{% translate 'Delete' %}</a>
       </div>
     </div>
@@ -30,7 +30,6 @@
     {% endif %}
     <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
         {{ form|crispy }}
-        <hr class="mb-4">
         <hr class="mb-4">
           {% include "bimblog/add_buttons.html" %}
         <hr class="mb-4">
