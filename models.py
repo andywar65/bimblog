@@ -24,7 +24,7 @@ class Building(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     slug = models.SlugField(max_length=100, editable=False, null=True)
     image = models.ImageField(_("Image"), max_length=200,
-        null=True, upload_to='uploads/buildings/images/')
+        null=True, blank=True, upload_to='uploads/buildings/images/')
     fb_image = FileBrowseField(_("Image"), max_length=200,
         extensions=[".jpg", ".png", ".jpeg", ".gif", ".tif", ".tiff"],
         null=True, directory='buildings/images/')
@@ -60,9 +60,11 @@ class Building(models.Model):
             self.slug = generate_unique_slug(Building, self.title)
         self.last_updated = now()
         super(Building, self).save(*args, **kwargs)
-        if self.image and not self.fb_image:
-            #save with filebrowser image, sloppy workaround to make working test
-            Building.objects.filter(id=self.id).update(fb_image=FileObject(str(self.image)))
+        if self.image:
+            #this is a sloppy workaround to make working test
+            #image is saved on the front end, passed to fb_image and deleted
+            Building.objects.filter(id=self.id).update(image=None,
+                fb_image=FileObject(str(self.image)))
 
     class Meta:
         verbose_name = _('Building')

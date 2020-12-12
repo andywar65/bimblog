@@ -16,7 +16,7 @@ class BuildingUpdateForm(ModelForm):
 
     class Meta:
         model = Building
-        fields = ( 'title', 'intro', 'date', 'address', 'lat', 'long',
+        fields = ( 'image', 'title', 'intro', 'date', 'address', 'lat', 'long',
             'zoom')
 
 class BuildingDeleteForm(forms.Form):
