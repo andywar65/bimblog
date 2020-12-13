@@ -123,7 +123,7 @@ class PhotoStation(models.Model):
     long = models.FloatField(_("Longitude"), null=True, blank=True)
 
     def __str__(self):
-        return self.title + ' / ' + self.prog.title
+        return self.title + ' / ' + self.build.title
 
     def save(self, *args, **kwargs):
         if not self.slug:
