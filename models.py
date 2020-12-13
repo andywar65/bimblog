@@ -101,3 +101,40 @@ class BuildingPlan(models.Model):
         verbose_name = _('Building plan')
         verbose_name_plural = _('Building plans')
         ordering = ('-elev', )
+
+def photo_station_default_intro():
+    return (_('Another photo station by %(sitename)s!') %
+        {'sitename': settings.WEBSITE_NAME})
+
+class PhotoStation(models.Model):
+
+    build = models.ForeignKey(Building, on_delete = models.CASCADE,
+        related_name='building_station', verbose_name = _('Building'))
+    plan = models.ForeignKey(BuildingPlan, on_delete = models.SET_NULL,
+        related_name='buildingplan_station', verbose_name = _('Building plan'),
+        null=True, blank=True)
+    title = models.CharField(_('Title'),
+        help_text=_("Title of the photo station"), max_length = 50, )
+    slug = models.SlugField(max_length=100, editable=False, null=True)
+    intro = models.CharField(_('Description'),
+        default = photo_station_default_intro,
+        max_length = 100)
+    lat = models.FloatField(_("Latitude"), null=True, blank=True)
+    long = models.FloatField(_("Longitude"), null=True, blank=True)
+
+    def __str__(self):
+        return self.title + ' / ' + self.prog.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(PhotoStation, self.title)
+        if not self.lat:
+            self.lat = self.build.lat
+        if not self.long:
+            self.long = self.build.long
+        super(PhotoStation, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = _('Photo station')
+        verbose_name_plural = _('Photo stations')
+        ordering = ('build', 'title')
