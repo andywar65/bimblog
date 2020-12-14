@@ -9,9 +9,9 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from .models import Building, BuildingPlan
+from .models import Building, BuildingPlan, PhotoStation
 from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
-    BuildingPlanCreateForm, BuildingPlanDeleteForm, )
+    BuildingPlanCreateForm, BuildingPlanDeleteForm, PhotoStationCreateForm )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -216,3 +216,36 @@ class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
         return (reverse('bimblog:building_detail',
             kwargs={'slug': self.build.slug}) +
             f'?plan_deleted={self.plan.title}')
+
+class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
+    model = PhotoStation
+    permission_required = 'bimblog.add_photostation'
+    form_class = PhotoStationCreateForm
+
+    def setup(self, request, *args, **kwargs):
+        super(PhotoStationCreateView, self).setup(request, *args, **kwargs)
+        #here we get the project by the slug
+        self.build = get_object_or_404( Building, slug = self.kwargs['slug'] )
+
+    def get_initial(self):
+        initial = super( PhotoStationCreateView, self ).get_initial()
+        initial['build'] = self.build.id
+        initial['lat'] = self.build.lat
+        initial['long'] = self.build.long
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #we add the following to feed the map
+        context['build'] = self.build
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return reverse('portfolio:station_create' ,
+                kwargs={'slug': self.build.slug})
+        else:
+            return reverse('portfolio:building_detail' ,
+                kwargs={'slug': self.build.slug})

@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.utils.translation import gettext as _
 
-from .models import Building, BuildingPlan
+from .models import Building, BuildingPlan, PhotoStation
 
 class BuildingCreateForm(ModelForm):
     image = forms.ImageField(label=_('Image'), required=True)
@@ -35,3 +35,16 @@ class BuildingPlanDeleteForm(forms.Form):
     delete = forms.BooleanField( label=_("Delete the building plan"),
         required = True,
         help_text = _("""Caution, can't undo this."""))
+
+class PhotoStationCreateForm(ModelForm):
+    build = forms.ModelChoiceField( label=_('Building'),
+        queryset=Building.objects.all(), disabled = True )
+
+    class Meta:
+        model = PhotoStation
+        fields = '__all__'
+
+    def __init__(self, **kwargs):
+        super(PhotoStationCreateForm, self).__init__(**kwargs)
+        #filter plan queryset
+        self.fields['plan'].queryset = BuildingPlan.objects.filter(build_id=self.initial['build'])
