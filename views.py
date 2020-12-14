@@ -238,14 +238,15 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
         context = super().get_context_data(**kwargs)
         #we add the following to feed the map
         context['build'] = self.build
+        context['plans'] = context['build'].building_plan
         context['mapbox_token'] = settings.MAPBOX_TOKEN
 
         return context
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
-            return reverse('portfolio:station_create' ,
+            return reverse('bimblog:station_create' ,
                 kwargs={'slug': self.build.slug})
         else:
-            return reverse('portfolio:building_detail' ,
+            return reverse('bimblog:building_detail' ,
                 kwargs={'slug': self.build.slug})
