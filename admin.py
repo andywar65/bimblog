@@ -5,7 +5,7 @@ from .models import Building, BuildingPlan, PhotoStation
 
 class BuildingPlanInline(admin.TabularInline):
     model = BuildingPlan
-    fields = ('title', 'elev', 'file')
+    fields = ('title', 'elev', 'file', 'refresh', 'geometry')
     extra = 0
 
 @admin.register(Building)

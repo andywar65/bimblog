@@ -81,8 +81,10 @@ class BuildingPlan(models.Model):
     elev = models.FloatField(_("Elevation in meters"), default = 0)
     file = models.FileField(_("DXF file"), max_length=200,
         upload_to="uploads/buildings/plans/dxf/",
-        validators=[FileExtensionValidator(allowed_extensions=['dxf', ])])
-    geometry = models.JSONField( editable=False, null=True, blank=True )
+        validators=[FileExtensionValidator(allowed_extensions=['dxf', ])],
+        null=True, blank=True )
+    refresh = models.BooleanField(_("Refresh geometry"), default=True)
+    geometry = models.JSONField( null=True, blank=True )
 
     def __str__(self):
         return self.title + ' | ' + str(self.elev)
@@ -93,9 +95,11 @@ class BuildingPlan(models.Model):
                 self.title + ' ' + str(self.elev))
         #upload file
         super(BuildingPlan, self).save(*args, **kwargs)
-        self.geometry = workflow(self.file, self.build.lat, self.build.long)
-        #save geometry
-        super(BuildingPlan, self).save(*args, **kwargs)
+        if self.refresh:
+            self.geometry = workflow(self.file, self.build.lat, self.build.long)
+            self.refresh = False
+            #save geometry
+            super(BuildingPlan, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _('Building plan')
