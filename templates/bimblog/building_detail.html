@@ -72,7 +72,7 @@
   var mymap = L.map('mapid', {
     center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
     zoom: {{ build.zoom|unlocalize }},
-    layers: [base_map, {% if plans %}plan_{{ plans.all.last.id }}{% endif %}]
+    layers: [base_map, {% if plans.all %}plan_{{ plans.all.last.id }}{% endif %}]
   });
 
   L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
