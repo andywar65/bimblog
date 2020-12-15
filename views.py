@@ -9,10 +9,10 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from .models import Building, BuildingPlan, PhotoStation
+from .models import Building, BuildingPlan, PhotoStation, StationImage
 from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
     BuildingPlanCreateForm, BuildingPlanDeleteForm, PhotoStationCreateForm,
-    PhotoStationDeleteForm )
+    PhotoStationDeleteForm, StationImageCreateForm )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -342,3 +342,31 @@ class PhotoStationDeleteView(PermissionRequiredMixin, FormView):
         return (reverse('bimblog:building_detail',
             kwargs={'slug': self.build.slug}) +
             f'?stat_deleted={self.stat.title}')
+
+class StationImageCreateView( PermissionRequiredMixin, CreateView ):
+    model = StationImage
+    permission_required = 'bimblog.add_stationimage'
+    form_class = StationImageCreateForm
+
+    def setup(self, request, *args, **kwargs):
+        super(StationImageCreateView, self).setup(request, *args, **kwargs)
+        #here we get the project by the slug
+        self.build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
+        self.stat = get_object_or_404( PhotoStation, slug = self.kwargs['stat_slug'] )
+        if not self.stat.build == self.build:
+            raise Http404(_("Station does not belong to Building"))
+
+    def get_initial(self):
+        initial = super( StationImageCreateView, self ).get_initial()
+        initial['stat'] = self.stat.id
+        return initial
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return reverse('bimblog:image_add',
+                kwargs={'build_slug': self.build.slug,
+                'stat_slug': self.stat.slug})
+        else:
+            return reverse('bimblog:station_detail',
+                kwargs={'build_slug': self.build.slug,
+                'stat_slug': self.stat.slug})

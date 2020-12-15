@@ -162,7 +162,7 @@ class StationImage(models.Model):
         if self.image:
             #this is a sloppy workaround to make working test
             #image is saved on the front end, passed to fb_image and deleted
-            Building.objects.filter(id=self.id).update(image=None,
+            StationImage.objects.filter(id=self.id).update(image=None,
                 fb_image=FileObject(str(self.image)))
 
     class Meta:

@@ -29,10 +29,10 @@
             <div class="carousel-caption d-none d-md-block">
               {% translate "No description" as default %}
               {% if day %}
-              <p><a href="{% url 'portfolio:station_detail' prog_slug=prog.slug stat_slug=image.stat.slug %}">
+              <p><a href="{# url 'portfolio:station_detail' prog_slug=prog.slug stat_slug=image.stat.slug #}">
                 {{ image.stat.title }}</a> - {{ image.caption|default_if_none:default }}</p>
               {% else %}
-              <p><a href="{% url 'portfolio:image_day' slug=stat.prog.slug year=image.date.year month=image.date.month day=image.date.day %}">
+              <p><a href="{# url 'portfolio:image_day' slug=stat.prog.slug year=image.date.year month=image.date.month day=image.date.day #}">
                 {{ image.date|date:"d/m/Y" }}</a> - {{ image.caption|default_if_none:default }}</p>
               {% endif %}
             </div>
