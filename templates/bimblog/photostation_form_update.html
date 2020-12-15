@@ -17,9 +17,16 @@
     {% include "bimblog/photostation_alerts.html" %}
     <h4><strong>{% translate "Modify photo station" %}</strong></h4>
     {% if perms.bimblog.change_photostation %}
-    <p>{% blocktranslate with name=user.get_short_name %}
-      Hello {{ name }}, fill the fields below then submit.
-    {% endblocktranslate %}</p>
+    <div class="row">
+      <div class="col col-md-8">
+        {% blocktranslate with name=user.get_short_name %}
+          Hello {{ name }}, update the fields below then submit.
+        {% endblocktranslate %}
+      </div>
+      <div class="col col-md-4 text-right">
+        <a class="btn btn-danger" href="{% url 'bimblog:station_delete' build_slug=object.build.slug stat_slug=object.slug %}">{% translate 'Delete' %}</a>
+      </div>
+    </div>
     <hr class="mb-4">
     {% if form.errors %}
       <p class="alert alert-danger" role="alert">
