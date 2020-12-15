@@ -264,6 +264,29 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
                 kwargs={'slug': self.build.slug}) +
                 f'?stat_created={self.object.title}')
 
+class PhotoStationDetailView( PermissionRequiredMixin, DetailView):
+    model = PhotoStation
+    permission_required = 'bimblog.view_photostation'
+    context_object_name = 'stat'
+    slug_field = 'slug'
+    slug_url_kwarg = 'stat_slug'
+
+    def get_object(self, queryset=None):
+        obj = super(PhotoStationDetailView, self).get_object(queryset=None)
+        build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
+        if not build == obj.build:
+            raise Http404(_("Station does not belong to Building"))
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #we add the following to feed the gallery
+        context['main_gal_slug'] = get_random_string(7)
+        #gallery images
+        context['images'] = self.object.station_image.all()
+
+        return context
+
 class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
     model = PhotoStation
     permission_required = 'bimblog.change_photostation'
