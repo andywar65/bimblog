@@ -81,6 +81,13 @@
 
   L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
 
+  {% if stations.all %}
+    {% for stat in stations.all %}
+      L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}]).addTo(mymap)
+        .bindPopup("<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5><img src=\"{% version stat.station_image.first.fb_image 'medium' %}\"><br><small>{{ stat.intro }}</small>");
+    {% endfor %}
+  {% endif %}
+
   var baseMaps = {
     "Base": base_map
   };
