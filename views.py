@@ -236,6 +236,10 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if 'stat_created' in self.request.GET:
+            context['stat_created'] = self.request.GET['stat_created']
+        if 'stat_modified' in self.request.GET:
+            context['stat_modified'] = self.request.GET['stat_modified']
         #we add the following to feed the map
         context['build'] = self.build
         context['plans'] = context['build'].building_plan
@@ -245,8 +249,10 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
-            return reverse('bimblog:station_create' ,
-                kwargs={'slug': self.build.slug})
+            return (reverse('bimblog:station_create',
+                kwargs={'slug': self.build.slug}) +
+                f'?stat_created={self.object.title}')
         else:
-            return reverse('bimblog:building_detail' ,
-                kwargs={'slug': self.build.slug})
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug}) +
+                f'?stat_created={self.object.title}')

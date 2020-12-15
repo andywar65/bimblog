@@ -14,7 +14,7 @@
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
-    {# include "bimblog/buildingplan_alerts.html" #}
+    {% include "bimblog/photostation_alerts.html" %}
     <h4><strong>{% translate "Add photo station" %}</strong></h4>
     {% if perms.bimblog.add_photostation %}
     <p>{% blocktranslate with name=user.get_short_name %}
