@@ -11,7 +11,9 @@ def create_bimblog_group(sender, **kwargs):
             'view_buildingplan', 'add_buildingplan', 'change_buildingplan',
             'delete_buildingplan',
             'view_photostation', 'add_photostation', 'change_photostation',
-            'delete_photostation',))
+            'delete_photostation',
+            'view_stationimage', 'add_stationimage', 'change_stationimage',
+            'delete_stationimage',))
         grp.permissions.set(permissions)
 
 class BimblogConfig(AppConfig):
