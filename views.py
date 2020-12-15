@@ -11,7 +11,8 @@ from django.utils.translation import gettext as _
 
 from .models import Building, BuildingPlan, PhotoStation
 from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
-    BuildingPlanCreateForm, BuildingPlanDeleteForm, PhotoStationCreateForm )
+    BuildingPlanCreateForm, BuildingPlanDeleteForm, PhotoStationCreateForm,
+    PhotoStationDeleteForm )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -53,6 +54,12 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
             context['plan_modified'] = self.request.GET['plan_modified']
         elif 'plan_deleted' in self.request.GET:
             context['plan_deleted'] = self.request.GET['plan_deleted']
+        elif 'stat_created' in self.request.GET:
+            context['stat_created'] = self.request.GET['stat_created']
+        elif 'stat_modified' in self.request.GET:
+            context['stat_modified'] = self.request.GET['stat_modified']
+        elif 'stat_deleted' in self.request.GET:
+            context['stat_deleted'] = self.request.GET['stat_deleted']
         #we add the following to feed the map
         context['mapbox_token'] = settings.MAPBOX_TOKEN
         return context
@@ -256,3 +263,59 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
             return (reverse('bimblog:building_detail',
                 kwargs={'slug': self.build.slug}) +
                 f'?stat_created={self.object.title}')
+
+class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
+    model = PhotoStation
+    permission_required = 'bimblog.change_photostation'
+    form_class = PhotoStationCreateForm
+    template_name = 'bimblog/photostation_form_update.html'
+    #we have two slugs, so we need to override next attribute
+    slug_url_kwarg = 'stat_slug'
+
+    def get_object(self, queryset=None):
+        #elsewhere we get the parent in setup, but here we also need object
+        stat = super(PhotoStationUpdateView, self).get_object(queryset=None)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['build_slug'] )
+        if not self.build == stat.build:
+            raise Http404(_("Station does not belong to Building"))
+        return stat
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:station_create',
+                kwargs={'slug': self.build.slug}) +
+                f'?stat_modified={self.object.title}')
+        else:
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug}) +
+                f'?stat_modified={self.object.title}')
+
+class PhotoStationDeleteView(PermissionRequiredMixin, FormView):
+    model = PhotoStation
+    permission_required = 'bimblog.delete_station'
+    form_class = PhotoStationDeleteForm
+    template_name = 'bimblog/photostation_form_delete.html'
+
+    def setup(self, request, *args, **kwargs):
+        super(PhotoStationDeleteView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['build_slug'] )
+        self.stat = get_object_or_404( PhotoStation,
+            slug = self.kwargs['stat_slug'] )
+        if not self.build == self.stat.build:
+            raise Http404(_("Station does not belong to Building"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.stat.title
+        return context
+
+    def form_valid(self, form):
+        self.stat.delete()
+        return super(PhotoStationDeleteView, self).form_valid(form)
+
+    def get_success_url(self):
+        return (reverse('bimblog:building_detail',
+            kwargs={'slug': self.build.slug}) +
+            f'?stat_deleted={self.stat.title}')

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load fb_versions %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{{ website.acro }} | {% translate "Modify photo station" %}{% endblock title %}
+
+{% block extra-head %}
+  {% include 'bimblog/leaflet_extra_head.html' %}
+{% endblock extra-head %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    {% include "bimblog/photostation_alerts.html" %}
+    <h4><strong>{% translate "Modify photo station" %}</strong></h4>
+    {% if perms.bimblog.change_photostation %}
+    <p>{% blocktranslate with name=user.get_short_name %}
+      Hello {{ name }}, fill the fields below then submit.
+    {% endblocktranslate %}</p>
+    <hr class="mb-4">
+    {% if form.errors %}
+      <p class="alert alert-danger" role="alert">
+        {% translate 'Fix the errors below, please' %}.
+      </p>
+    {% endif %}
+    <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
+        {{ form|crispy }}
+        <hr class="mb-4">
+        <div class="row">
+          <div class="col" id="mapid" style="height: 480px;"></div>
+        </div>
+        <hr class="mb-4">
+          {% include "bimblog/add_buttons.html" %}
+        <hr class="mb-4">
+      {% csrf_token %}
+    </form>
+    {% else %}
+    {% translate "You don't have permissions to change photo stations" %}.
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+{% block extra-js %}
+<script type="text/javascript">
+
+  var base_map = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 21,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: '{{ mapbox_token }}'
+  });
+
+  {% if plans %}{% for plan in plans.all %}
+  {% for obj in plan.geometry %}
+  var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %}});
+  {% endfor %}
+  var plan_{{ plan.id }} = L.layerGroup([{% for obj in plan.geometry %}plan_{{ plan.id }}_{{ forloop.counter }}{% if not forloop.last %},{% endif %}{% endfor %}]);
+  {% endfor %}{% endif %}
+
+  var mymap = L.map('mapid', {
+    center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
+    zoom: {{ build.zoom|unlocalize }},
+    layers: [base_map, {% if plans.all %}plan_{{ plans.all.last.id }}{% endif %}]
+  });
+
+  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
+
+  var baseMaps = {
+    "Base": base_map
+  };
+
+  var overlayMaps = { {% if plans %}{% for plan in plans.all %}
+    "{{ plan.title }}": plan_{{ plan.id }}{% if not forloop.last %},{% endif %}
+  {% endfor %}{% endif %} };
+
+  L.control.layers(baseMaps, overlayMaps).addTo(mymap);
+
+  function onMapClick(e) {
+    var inputlat = document.getElementById("id_lat");
+    var inputlong = document.getElementById("id_long");
+    inputlat.setAttribute('value', e.latlng.lat);
+    inputlong.setAttribute('value', e.latlng.lng);
+  }
+
+  mymap.on('click', onMapClick);
+
+</script>
+{% endblock extra-js %}

@@ -48,3 +48,8 @@ class PhotoStationCreateForm(ModelForm):
         super(PhotoStationCreateForm, self).__init__(**kwargs)
         #filter plan queryset
         self.fields['plan'].queryset = BuildingPlan.objects.filter(build_id=self.initial['build'])
+
+class PhotoStationDeleteForm(forms.Form):
+    delete = forms.BooleanField( label=_("Delete photo station"),
+        required = True,
+        help_text = _("""Caution, can't undo this."""))
