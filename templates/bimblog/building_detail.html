@@ -22,6 +22,9 @@
     {% if perms.bimblog.add_buildingplan %}
       <a class="btn btn-secondary" href="{% url 'bimblog:buildingplan_create' slug=build.slug %}">{% translate "Add building plan" %}</a>
     {% endif %}
+    {% if perms.bimblog.add_photostation %}
+      <a class="btn btn-secondary" href="{% url 'bimblog:station_create' slug=build.slug %}">{% translate "Add photo station" %}</a>
+    {% endif %}
   </div>
 </div>
 <hr class="mb-4">
