@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
-from .models import Building, BuildingPlan, PhotoStation
+from .models import Building, BuildingPlan, PhotoStation, StationImage
 
 class BuildingPlanInline(admin.TabularInline):
     model = BuildingPlan
@@ -25,7 +25,13 @@ class BuildingAdmin(admin.ModelAdmin):
         }),
         )
 
+class StationImageInline(admin.TabularInline):
+    model = StationImage
+    fields = ('date', 'fb_image', 'caption', )
+    extra = 0
+
 @admin.register(PhotoStation)
 class PhotoStationAdmin(admin.ModelAdmin):
     list_display = ( 'title', 'intro', 'build', 'plan', 'lat', 'long')
     list_editable = ( 'lat', 'long')
+    inlines = [ StationImageInline,  ]

@@ -142,3 +142,30 @@ class PhotoStation(models.Model):
         verbose_name = _('Photo station')
         verbose_name_plural = _('Photo stations')
         ordering = ('build', 'title')
+
+class StationImage(models.Model):
+    stat = models.ForeignKey(PhotoStation, null=True,
+        on_delete = models.CASCADE, related_name='station_image',
+        verbose_name = _('Station'))
+    date = models.DateTimeField(_('Date:'), default = now, )
+    image = models.ImageField(_("Image"), max_length=200,
+        null=True, blank=True, upload_to='uploads/buildings/images/')
+    fb_image = FileBrowseField(_("Image"), max_length=200,
+        extensions=[".jpg", ".png", ".jpeg", ".gif", ".tif", ".tiff"],
+        null=True, directory='images/buildings/images/')
+    caption = models.CharField(_("Caption"), max_length = 200, blank=True,
+        null=True)
+
+    def save(self, *args, **kwargs):
+        #save and upload image
+        super(StationImage, self).save(*args, **kwargs)
+        if self.image:
+            #this is a sloppy workaround to make working test
+            #image is saved on the front end, passed to fb_image and deleted
+            Building.objects.filter(id=self.id).update(image=None,
+                fb_image=FileObject(str(self.image)))
+
+    class Meta:
+        verbose_name=_("Image")
+        verbose_name_plural=_("Images")
+        ordering = ('-date', )
