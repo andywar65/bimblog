@@ -70,3 +70,8 @@ class StationImageUpdateForm(ModelForm):
     class Meta:
         model = StationImage
         fields = ( 'image', 'stat', 'date', 'caption')
+
+class StationImageDeleteForm(forms.Form):
+    delete = forms.BooleanField( label=_("Delete image"),
+        required = True,
+        help_text = _("""Caution, can't undo this."""))

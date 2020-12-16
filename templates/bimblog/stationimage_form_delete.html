@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{{ website.acro }} | {% translate 'Delete image' %}{%endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <h4><strong>{% translate 'Delete image:' %} {{ title }}</strong></h4>
+    {% if perms.bimblog.delete_stationimage %}
+    <hr class="mb-4">
+    {% if form.errors %}
+      <p class="alert alert-danger" role="alert">
+        {% translate 'Fix the errors below, please' %}.
+      </p>
+    {% endif %}
+    <form action="" method="post" novalidate>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form.delete|as_crispy_field }}
+        </div>
+      </div>
+      <hr class="mb-4">
+        <button class="btn btn-secondary btn-lg btn-block" type="submit">{% translate 'Delete' %}</button>
+        <small>{% translate 'Fields with asterisk (*) are required' %}</small>
+      <hr class="mb-4">
+      {% csrf_token %}
+    </form>
+    {% else %}
+    <p>{% translate "You don't have permissions to delete images" %}.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

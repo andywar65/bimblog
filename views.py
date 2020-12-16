@@ -12,7 +12,8 @@ from django.utils.translation import gettext as _
 from .models import Building, BuildingPlan, PhotoStation, StationImage
 from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
     BuildingPlanCreateForm, BuildingPlanDeleteForm, PhotoStationCreateForm,
-    PhotoStationDeleteForm, StationImageCreateForm, StationImageUpdateForm )
+    PhotoStationDeleteForm, StationImageCreateForm, StationImageUpdateForm,
+    StationImageDeleteForm )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -402,3 +403,34 @@ class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
                 kwargs={'build_slug': self.build.slug,
                 'stat_slug': self.stat.slug}) +
                 f'?img_modified={self.object.id}')
+
+class StationImageDeleteView(PermissionRequiredMixin, FormView):
+    permission_required = 'bimblog.delete_stationimage'
+    form_class = StationImageDeleteForm
+    template_name = 'bimblog/stationimage_form_delete.html'
+
+    def setup(self, request, *args, **kwargs):
+        super(StationImageDeleteView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['build_slug'] )
+        self.stat = get_object_or_404( PhotoStation,
+            slug = self.kwargs['stat_slug'] )
+        self.img = get_object_or_404( StationImage, id = self.kwargs['pk'])
+        if not self.build == self.stat.build:
+            raise Http404(_("Station does not belong to Building"))
+        if not self.stat == self.img.stat:
+            raise Http404(_("Image does not belong to Photo Station"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.img.id
+        return context
+
+    def form_valid(self, form):
+        self.img.delete()
+        return super(StationImageDeleteView, self).form_valid(form)
+
+    def get_success_url(self):
+        return (reverse('bimblog:station_detail',
+            kwargs={'build_slug': self.build.slug, 'stat_slug': self.stat.slug}) +
+            f'?img_deleted={self.img.id}')

@@ -19,7 +19,7 @@
         {% endblocktranslate %}
       </div>
       <div class="col col-md-4 text-right">
-        <a class="btn btn-danger" href="{# url 'bimblog:image_delete' build_slug=object.stat.build.slug stat_slug=object.stat.slug id=object.id #}">{% translate 'Delete' %}</a>
+        <a class="btn btn-danger" href="{% url 'bimblog:image_delete' build_slug=object.stat.build.slug stat_slug=object.stat.slug pk=object.id %}">{% translate 'Delete' %}</a>
       </div>
     </div>
     <hr class="mb-4">
