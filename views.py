@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 from .models import Building, BuildingPlan, PhotoStation, StationImage
 from .forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
     BuildingPlanCreateForm, BuildingPlanDeleteForm, PhotoStationCreateForm,
-    PhotoStationDeleteForm, StationImageCreateForm )
+    PhotoStationDeleteForm, StationImageCreateForm, StationImageUpdateForm )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building
@@ -55,10 +55,10 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
             context['plan_modified'] = self.request.GET['plan_modified']
         elif 'plan_deleted' in self.request.GET:
             context['plan_deleted'] = self.request.GET['plan_deleted']
-        elif 'stat_created' in self.request.GET:
-            context['stat_created'] = self.request.GET['stat_created']
-        elif 'stat_modified' in self.request.GET:
-            context['stat_modified'] = self.request.GET['stat_modified']
+        #elif 'stat_created' in self.request.GET:
+            #context['stat_created'] = self.request.GET['stat_created']
+        #elif 'stat_modified' in self.request.GET:
+            #context['stat_modified'] = self.request.GET['stat_modified']
         elif 'stat_deleted' in self.request.GET:
             context['stat_deleted'] = self.request.GET['stat_deleted']
         #we add the following to feed the map
@@ -364,10 +364,38 @@ class StationImageCreateView( PermissionRequiredMixin, CreateView ):
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
-            return reverse('bimblog:image_add',
+            return (reverse('bimblog:image_add',
                 kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug})
+                'stat_slug': self.stat.slug}) +
+                f'?img_created={self.object.id}')
         else:
-            return reverse('bimblog:station_detail',
+            return (reverse('bimblog:station_detail',
                 kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug})
+                'stat_slug': self.stat.slug}) +
+                f'?img_created={self.object.id}')
+
+class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
+    model = StationImage
+    permission_required = 'bimblog.add_stationimage'
+    form_class = StationImageUpdateForm
+    template_name = 'bimblog/stationimage_form_update.html'
+
+    def setup(self, request, *args, **kwargs):
+        super(StationImageUpdateView, self).setup(request, *args, **kwargs)
+        #here we get the project by the slug
+        self.build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
+        self.stat = get_object_or_404( PhotoStation, slug = self.kwargs['stat_slug'] )
+        if not self.stat.build == self.build:
+            raise Http404(_("Station does not belong to Building"))
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:image_add',
+                kwargs={'build_slug': self.build.slug,
+                'stat_slug': self.stat.slug}) +
+                f'?img_modified={self.object.id}')
+        else:
+            return (reverse('bimblog:station_detail',
+                kwargs={'build_slug': self.build.slug,
+                'stat_slug': self.stat.slug}) +
+                f'?img_modified={self.object.id}')

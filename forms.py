@@ -62,3 +62,11 @@ class StationImageCreateForm(ModelForm):
     class Meta:
         model = StationImage
         fields = ( 'stat', 'date', 'image', 'caption')
+
+class StationImageUpdateForm(ModelForm):
+    stat = forms.ModelChoiceField( label=_('Photo station'),
+        queryset=PhotoStation.objects.all(), disabled = True )
+
+    class Meta:
+        model = StationImage
+        fields = ( 'image', 'stat', 'date', 'caption')

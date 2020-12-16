@@ -5,7 +5,7 @@ from .views import (BuildingListView, BuildingDetailView, BuildingCreateView,
     BuildingUpdateView, BuildingDeleteView, BuildingPlanCreateView,
     BuildingPlanUpdateView, BuildingPlanDeleteView, PhotoStationCreateView,
     PhotoStationDetailView, PhotoStationUpdateView, PhotoStationDeleteView,
-    StationImageCreateView)
+    StationImageCreateView, StationImageUpdateView)
 
 app_name = 'bimblog'
 urlpatterns = [
@@ -28,6 +28,8 @@ urlpatterns = [
         PhotoStationUpdateView.as_view(), name = 'station_change'),
     path('<slug:build_slug>/station/<slug:stat_slug>/delete/',
         PhotoStationDeleteView.as_view(), name = 'station_delete'),
-    path(_('<slug:build_slug>/stations/<slug:stat_slug>/add/'),
+    path(_('<slug:build_slug>/stations/<slug:stat_slug>/image/add/'),
         StationImageCreateView.as_view(), name = 'image_add'),
+    path(_('<slug:build_slug>/stations/<slug:stat_slug>/image/<pk>/change'),
+        StationImageUpdateView.as_view(), name = 'image_change'),
     ]
