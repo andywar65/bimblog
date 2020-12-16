@@ -23,11 +23,11 @@ class BuildingListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'created' in self.request.GET:
-            context['created'] = self.request.GET['created']
-        elif 'modified' in self.request.GET:
-            context['modified'] = self.request.GET['modified']
-        elif 'deleted' in self.request.GET:
+        #if 'created' in self.request.GET:
+            #context['created'] = self.request.GET['created']
+        #elif 'modified' in self.request.GET:
+            #context['modified'] = self.request.GET['modified']
+        if 'deleted' in self.request.GET:
             context['deleted'] = self.request.GET['deleted']
         #we add the following to feed the map
         context['city_lat'] = settings.CITY_LAT
@@ -35,6 +35,35 @@ class BuildingListView(PermissionRequiredMixin, ListView):
         context['city_zoom'] = settings.CITY_ZOOM
         context['mapbox_token'] = settings.MAPBOX_TOKEN
         return context
+
+class BuildingCreateView( PermissionRequiredMixin, CreateView ):
+    model = Building
+    permission_required = 'bimblog.add_building'
+    form_class = BuildingCreateForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'created' in self.request.GET:
+            context['created'] = self.request.GET['created']
+        elif 'modified' in self.request.GET:
+            context['modified'] = self.request.GET['modified']
+        #elif 'deleted' in self.request.GET:
+            #context['deleted'] = self.request.GET['deleted']
+        #we add the following to feed the map
+        context['city_lat'] = settings.CITY_LAT
+        context['city_long'] = settings.CITY_LONG
+        context['city_zoom'] = settings.CITY_ZOOM
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:building_create') +
+                f'?created={self.object.title}')
+        else:
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.object.slug }) +
+                f'?created={self.object.title}')
 
 class BuildingDetailView(PermissionRequiredMixin, DetailView):
     model = Building
@@ -66,35 +95,6 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         context['mapbox_token'] = settings.MAPBOX_TOKEN
         return context
 
-class BuildingCreateView( PermissionRequiredMixin, CreateView ):
-    model = Building
-    permission_required = 'bimblog.add_building'
-    form_class = BuildingCreateForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'created' in self.request.GET:
-            context['created'] = self.request.GET['created']
-        elif 'modified' in self.request.GET:
-            context['modified'] = self.request.GET['modified']
-        elif 'deleted' in self.request.GET:
-            context['deleted'] = self.request.GET['deleted']
-        #we add the following to feed the map
-        context['city_lat'] = settings.CITY_LAT
-        context['city_long'] = settings.CITY_LONG
-        context['city_zoom'] = settings.CITY_ZOOM
-        context['mapbox_token'] = settings.MAPBOX_TOKEN
-        return context
-
-    def get_success_url(self):
-        if 'add_another' in self.request.POST:
-            return (reverse('bimblog:building_create') +
-                f'?created={self.object.title}')
-        else:
-            return (reverse('bimblog:building_detail',
-                kwargs={'slug': self.object.slug }) +
-                f'?created={self.object.title}')
-
 class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
     model = Building
     permission_required = 'bimblog.change_building'
@@ -117,7 +117,7 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
                 f'?modified={self.object.title}')
 
 class BuildingDeleteView(PermissionRequiredMixin, FormView):
-    model = Building
+    #model = Building
     permission_required = 'bimblog.delete_building'
     form_class = BuildingDeleteForm
     template_name = 'bimblog/building_form_delete.html'
@@ -198,7 +198,7 @@ class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
                 f'?plan_modified={self.object.title}')
 
 class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
-    model = BuildingPlan
+    #model = BuildingPlan
     permission_required = 'bimblog.delete_buildingplan'
     form_class = BuildingPlanDeleteForm
     template_name = 'bimblog/buildingplan_form_delete.html'
@@ -233,7 +233,7 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
 
     def setup(self, request, *args, **kwargs):
         super(PhotoStationCreateView, self).setup(request, *args, **kwargs)
-        #here we get the project by the slug
+        #here we get the building by the slug
         self.build = get_object_or_404( Building, slug = self.kwargs['slug'] )
 
     def get_initial(self):
@@ -247,7 +247,7 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
         context = super().get_context_data(**kwargs)
         if 'stat_created' in self.request.GET:
             context['stat_created'] = self.request.GET['stat_created']
-        if 'stat_modified' in self.request.GET:
+        elif 'stat_modified' in self.request.GET:
             context['stat_modified'] = self.request.GET['stat_modified']
         #we add the following to feed the map
         context['build'] = self.build
@@ -282,6 +282,16 @@ class PhotoStationDetailView( PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if 'stat_created' in self.request.GET:
+            context['stat_created'] = self.request.GET['stat_created']
+        elif 'stat_modified' in self.request.GET:
+            context['stat_modified'] = self.request.GET['stat_modified']
+        elif 'img_created' in self.request.GET:
+            context['img_created'] = self.request.GET['img_created']
+        elif 'img_modified' in self.request.GET:
+            context['img_modified'] = self.request.GET['img_modified']
+        elif 'img_deleted' in self.request.GET:
+            context['img_deleted'] = self.request.GET['img_deleted']
         #we add the following to feed the gallery
         context['main_gal_slug'] = get_random_string(7)
         #gallery images
@@ -312,13 +322,14 @@ class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
                 kwargs={'slug': self.build.slug}) +
                 f'?stat_modified={self.object.title}')
         else:
-            return (reverse('bimblog:building_detail',
-                kwargs={'slug': self.build.slug}) +
+            return (reverse('bimblog:station_detail',
+                kwargs={'build_slug': self.build.slug,
+                'stat_slug': self.object.slug}) +
                 f'?stat_modified={self.object.title}')
 
 class PhotoStationDeleteView(PermissionRequiredMixin, FormView):
-    model = PhotoStation
-    permission_required = 'bimblog.delete_station'
+    #model = PhotoStation
+    permission_required = 'bimblog.delete_photostation'
     form_class = PhotoStationDeleteForm
     template_name = 'bimblog/photostation_form_delete.html'
 
@@ -377,7 +388,7 @@ class StationImageCreateView( PermissionRequiredMixin, CreateView ):
 
 class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
     model = StationImage
-    permission_required = 'bimblog.add_stationimage'
+    permission_required = 'bimblog.change_stationimage'
     form_class = StationImageUpdateForm
     template_name = 'bimblog/stationimage_form_update.html'
 
