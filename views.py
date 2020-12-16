@@ -380,13 +380,16 @@ class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
     form_class = StationImageUpdateForm
     template_name = 'bimblog/stationimage_form_update.html'
 
-    def setup(self, request, *args, **kwargs):
-        super(StationImageUpdateView, self).setup(request, *args, **kwargs)
-        #here we get the project by the slug
+    def get_object(self, queryset=None):
+        #elsewhere we get the parent in setup, but here we also need object
+        img = super(StationImageUpdateView, self).get_object(queryset=None)
         self.build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
         self.stat = get_object_or_404( PhotoStation, slug = self.kwargs['stat_slug'] )
         if not self.stat.build == self.build:
             raise Http404(_("Station does not belong to Building"))
+        if not self.stat == img.stat:
+            raise Http404(_("Image does not belong to Photo Station"))
+        return img
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
