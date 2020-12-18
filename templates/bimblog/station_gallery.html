@@ -27,12 +27,12 @@
           {% if image.caption or forloop.first %}
             <div class="gradient-mask"></div>
             <div class="carousel-caption d-none d-md-block">
-              {% translate "No description" as default %}
               {% if day %}
                 <p><a class="text-light" href="{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=image.stat.slug %}">{{ image.stat.title }}</a> -
               {% else %}
                 <p><a class="text-light" href="{% url 'bimblog:image_day' slug=stat.build.slug year=image.date.year month=image.date.month day=image.date.day %}">{{ image.date|date:"d/m/Y" }}</a> -
               {% endif %}
+              {% translate "No description" as default %}
                 <a class="text-light" href="{% url 'bimblog:image_change' build_slug=image.stat.build.slug stat_slug=image.stat.slug pk=image.id %}"> {{ image.caption|default_if_none:default }}</a></p>
             </div>
           {% endif %}
