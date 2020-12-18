@@ -46,7 +46,7 @@
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
-    {% if plans.all %}
+    {% if plans %}
       <hr class="mb-4">
       {% include 'bimblog/building_detail_plans.html' %}
     {% endif %}
@@ -66,7 +66,7 @@
     accessToken: '{{ mapbox_token }}'
   });
 
-  {% if plans %}{% for plan in plans.all %}
+  {% if plans %}{% for plan in plans %}
   {% for obj in plan.geometry %}
   var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %}}).bindPopup("{{ obj.popup }}");
   {% endfor %}
@@ -76,13 +76,13 @@
   var mymap = L.map('mapid', {
     center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
     zoom: {{ build.zoom|unlocalize }},
-    layers: [base_map, {% if plans.all %}plan_{{ plans.all.last.id }}{% endif %}]
+    layers: [base_map, {% if plans %}plan_{{ plans.last.id }}{% endif %}]
   });
 
   L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
 
-  {% if stations.all %}
-    {% for stat in stations.all %}
+  {% if stations %}
+    {% for stat in stations %}
       L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}]).addTo(mymap)
         .bindPopup("<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5><img src=\"{% version stat.station_image.first.fb_image 'medium' %}\"><br><small>{{ stat.intro }}</small>");
     {% endfor %}
@@ -92,7 +92,7 @@
     "Base": base_map
   };
 
-  var overlayMaps = { {% if plans %}{% for plan in plans.all %}
+  var overlayMaps = { {% if plans %}{% for plan in plans %}
     "{{ plan.title }}": plan_{{ plan.id }}{% if not forloop.last %},{% endif %}
   {% endfor %}{% endif %} };
 

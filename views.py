@@ -73,8 +73,8 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plans'] = context['build'].building_plan
-        context['stations'] = context['build'].building_station
+        context['plans'] = context['build'].building_plan.all()
+        context['stations'] = context['build'].building_station.all()
         if 'created' in self.request.GET:
             context['created'] = self.request.GET['created']
         elif 'modified' in self.request.GET:
@@ -251,7 +251,7 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
             context['stat_modified'] = self.request.GET['stat_modified']
         #we add the following to feed the map
         context['build'] = self.build
-        context['plans'] = context['build'].building_plan
+        context['plans'] = context['build'].building_plan.all()
         context['mapbox_token'] = settings.MAPBOX_TOKEN
 
         return context

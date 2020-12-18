@@ -55,7 +55,7 @@
     accessToken: '{{ mapbox_token }}'
   });
 
-  {% if plans %}{% for plan in plans.all %}
+  {% if plans %}{% for plan in plans %}
   {% for obj in plan.geometry %}
   var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %}});
   {% endfor %}
@@ -65,7 +65,7 @@
   var mymap = L.map('mapid', {
     center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
     zoom: {{ build.zoom|unlocalize }},
-    layers: [base_map, {% if plans.all %}plan_{{ plans.all.last.id }}{% endif %}]
+    layers: [base_map, {% if plans %}plan_{{ plans.last.id }}{% endif %}]
   });
 
   L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
@@ -74,7 +74,7 @@
     "Base": base_map
   };
 
-  var overlayMaps = { {% if plans %}{% for plan in plans.all %}
+  var overlayMaps = { {% if plans %}{% for plan in plans %}
     "{{ plan.title }}": plan_{{ plan.id }}{% if not forloop.last %},{% endif %}
   {% endfor %}{% endif %} };
 
