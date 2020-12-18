@@ -75,6 +75,8 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['plans'] = context['build'].building_plan.all()
         context['stations'] = context['build'].building_station.all()
+        stat_list = context['stations'].values_list('id')
+        context['dates'] = StationImage.objects.filter(stat_id__in=stat_list).dates('date', 'day')
         if 'created' in self.request.GET:
             context['created'] = self.request.GET['created']
         elif 'modified' in self.request.GET:
@@ -445,3 +447,32 @@ class StationImageDeleteView(PermissionRequiredMixin, FormView):
         return (reverse('bimblog:station_detail',
             kwargs={'build_slug': self.build.slug, 'stat_slug': self.stat.slug}) +
             f'?img_deleted={self.img.id}')
+
+class StationImageDayArchiveView( PermissionRequiredMixin, DayArchiveView ):
+    model = StationImage
+    permission_required = 'bimblog.view_stationimage'
+    date_field = 'date'
+    allow_future = True
+    context_object_name = 'images'
+    year_format = '%Y'
+    month_format = '%m'
+    day_format = '%d'
+    allow_empty = True
+
+    def setup(self, request, *args, **kwargs):
+        super(StationImageDayArchiveView, self).setup(request, *args, **kwargs)
+        #here we get the project by the slug
+        self.build = get_object_or_404( Building, slug = self.kwargs['slug'] )
+
+    def get_queryset(self):
+        qs = super(StationImageDayArchiveView, self).get_queryset()
+        #here we get the station ids by project related name
+        stations = self.build.building_station.values_list('id', flat = True)
+        return qs.filter( stat__in = stations )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #we add the following to feed the gallery
+        context['main_gal_slug'] = get_random_string(7)
+        context['build'] = self.build
+        return context

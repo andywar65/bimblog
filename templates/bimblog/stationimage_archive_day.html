@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ website.acro }} | {{ build.title }} {{ day }}{% endblock title %}
+
+{% block content %}
+    {% if images %}
+      {% include 'bimblog/station_gallery.html' %}
+    {% else %}
+    <p>{% translate "No images today" %}.</p>
+    {% endif %}
+      <div class="row row-striped">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+          <h3 class="text-uppercase"><strong>{{ day }} /
+            <a href="{% url 'bimblog:building_detail' slug=build.slug %}">{{ build.title }}</a></strong></h3>
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <i class="fa fa-camera" aria-hidden="true"></i>
+              <a href="{% url 'bimblog:building_detail' slug=build.slug %}">{% translate "Photo stations" %}</a>
+            </li>
+          </ul>
+          <hr>
+          <p><em>{{ build.intro }}</em></p>
+        </div>
+      </div>
+      <nav aria-label="Page navigation container">
+  <ul class="pagination justify-content-center">
+    {% if previous_day %}
+    <li><a href="{% url 'bimblog:image_day' slug=build.slug year=previous_day.year month=previous_day.month day=previous_day.day %}" class="page-link">&laquo; {% translate "PREVIOUS" %} </a></li>
+    {% endif %}
+    {% if next_day %}
+    <li><a href="{% url 'bimblog:image_day' slug=build.slug year=next_day.year month=next_day.month day=next_day.day %}" class="page-link"> {% translate "NEXT" %} &raquo;</a></li>
+    {% endif %}
+  </ul>
+  </nav>
+{% endblock content %}
