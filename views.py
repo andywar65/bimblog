@@ -73,10 +73,23 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        #add plans and stations
         context['plans'] = context['build'].building_plan.all()
         context['stations'] = context['build'].building_station.all()
-        stat_list = context['stations'].values_list('id')
-        context['dates'] = StationImage.objects.filter(stat_id__in=stat_list).dates('date', 'day')
+        #add station lists
+        context['stat_list'] = {}
+        context['stat_list']['all'] = context['stations'].values_list('id')
+        #add dates for images by date
+        context['dates'] = StationImage.objects.filter(stat_id__in=context['stat_list']['all']).dates('date', 'day')
+        #add station lists by plan
+        for plan in context['plans']:
+            yes_plan = context['stations'].filter(plan_id=plan.id)
+            if yes_plan:
+                context['stat_list'][plan.id] = yes_plan.values_list('id', flat=True)
+        no_plan = context['stations'].filter(plan_id=None)
+        if no_plan:
+            context['stat_list']['no_plan'] = no_plan.values_list('id', flat=True)
+        #add alerts
         if 'created' in self.request.GET:
             context['created'] = self.request.GET['created']
         elif 'modified' in self.request.GET:
