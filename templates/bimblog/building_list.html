@@ -40,12 +40,11 @@
   }).addTo(mymap);
 
   {% if builds %}
-      {% for build in builds %}
-        L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).addTo(mymap)
-          .bindPopup("<h5><a href=\"{% url 'bimblog:building_detail' slug=build.slug %}\">{{ build.title }}</a></h5><img src=\"{% version build.fb_image 'medium' %}\"><br><small>{{ build.intro }}</small>");
-      {% endfor %}
-    {% endif %}
-
-
+    {% for build in builds %}
+      var content = "<h5><a href=\"{% url 'bimblog:building_detail' slug=build.slug %}\">{{ build.title }}</a></h5><img src=\"{% version build.fb_image 'medium' %}\"><br><small>{{ build.intro }}</small>"
+      L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).addTo(mymap)
+        .bindPopup(content, {minWidth: 300});
+    {% endfor %}
+  {% endif %}
 </script>
 {% endblock extra-js %}
