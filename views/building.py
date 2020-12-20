@@ -80,13 +80,9 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         #add dates for images by date
         context['dates'] = StationImage.objects.filter(stat_id__in=context['stat_list']['all']).dates('date', 'day')
         #add station lists by plan
-        for plan in context['plans']:
-            yes_plan = context['stations'].filter(plan_id=plan.id)
-            if yes_plan:
-                context['stat_list'][plan.id] = yes_plan.values_list('id', flat=True)
         no_plan = context['stations'].filter(plan_id=None)
         if no_plan:
-            context['stat_list']['no_plan'] = no_plan.values_list('id', flat=True)
+            context['no_plan'] = no_plan
         #add alerts
         if 'created' in self.request.GET:
             context['created'] = self.request.GET['created']

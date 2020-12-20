@@ -56,7 +56,7 @@
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col col-md-8">
-    <h5 id="dates"><strong>{% translate "Images by date" %}:</h5>
+    <h5 id="dates"><strong>{% translate "Images by date" %}:</strong></h5>
       <ul>
         {% for date in dates %}
         <li><a href="{% url 'bimblog:image_day' slug=build.slug year=date.year month=date.month day=date.day %}">{{ date|date:"Y M d" }}</a></li>
@@ -83,31 +83,40 @@
   {% for obj in plan.geometry %}
   var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %}}).bindPopup("{{ obj.popup }}");
   {% endfor %}
-  var plan_{{ plan.id }} = L.layerGroup([{% for obj in plan.geometry %}plan_{{ plan.id }}_{{ forloop.counter }}{% if not forloop.last %},{% endif %}{% endfor %}]);
   {% endfor %}{% endif %}
+
+  {% if stations %}{% for stat in stations %}
+  var stat_{{ stat.id }} =  L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}])
+    .bindPopup("<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5><img src=\"{% version stat.station_image.first.fb_image 'medium' %}\"><br><small>{{ stat.intro }}</small>");
+  {% endfor %}{% endif %}
+
+  {% if plans %}{% for plan in plans %}
+  var plan_{{ plan.id }} = L.layerGroup([{% for obj in plan.geometry %}plan_{{ plan.id }}_{{ forloop.counter }},{% endfor %}{% for stat in stations %}{% if stat.plan.id == plan.id %}stat_{{ stat.id }},{% endif %}{% endfor %}]);
+  {% endfor %}{% endif %}
+
+  {% if no_plan %}
+  var no_plan = L.layerGroup([{% for stat in no_plan %}stat_{{ stat.id }},{% endfor %}]);
+  {% endif %}
 
   var mymap = L.map('mapid', {
     center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
     zoom: {{ build.zoom|unlocalize }},
-    layers: [base_map, {% if plans %}plan_{{ plans.last.id }}{% endif %}]
+    layers: [base_map, {% if plans %}plan_{{ plans.last.id }}{% endif %}, {% if no_plan %}no_plan{% endif %}]
   });
 
   L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
 
-  {% if stations %}
-    {% for stat in stations %}
-      L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}]).addTo(mymap)
-        .bindPopup("<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5><img src=\"{% version stat.station_image.first.fb_image 'medium' %}\"><br><small>{{ stat.intro }}</small>");
-    {% endfor %}
-  {% endif %}
+
 
   var baseMaps = {
     "Base": base_map
   };
 
   var overlayMaps = { {% if plans %}{% for plan in plans %}
-    "{{ plan.title }}": plan_{{ plan.id }}{% if not forloop.last %},{% endif %}
-  {% endfor %}{% endif %} };
+    "{{ plan.title }}": plan_{{ plan.id }},
+  {% endfor %}{% endif %}
+  {% if no_plan %}"{% translate 'No plan' %}": no_plan{% endif %}
+  };
 
   L.control.layers(baseMaps, overlayMaps).addTo(mymap);
 
