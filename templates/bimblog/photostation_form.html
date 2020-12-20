@@ -68,7 +68,9 @@
     layers: [base_map, {% if plans %}plan_{{ plans.last.id }}{% endif %}]
   });
 
-  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
+  var content = "<h5><a href=\"{% url 'bimblog:building_detail' slug=build.slug %}\">{{ build.title }}</a></h5><img src=\"{% version build.fb_image 'medium' %}\"><br><small>{{ build.intro }}</small>"
+  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).addTo(mymap)
+    .bindPopup(content, {minWidth: 300});
 
   var baseMaps = {
     "Base": base_map
