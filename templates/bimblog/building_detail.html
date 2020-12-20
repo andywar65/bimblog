@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load fb_versions %}
 {% load i18n %}
 {% load l10n %}
@@ -70,6 +71,17 @@
 {% block extra-js %}
 <script type="text/javascript">
 
+  var cameraIcon = L.icon({
+    iconUrl: '{% static "bimblog/images/camera-icon.png" %}',
+    shadowUrl: '{% static "bimblog/images/marker-shadow.png" %}',
+
+    iconSize:     [25, 41], // size of the icon
+    shadowSize:   [41, 41], // size of the shadow
+    iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+    shadowAnchor: [12, 40],  // the same for the shadow
+    popupAnchor:  [-3, -35] // point from which the popup should open relative to the iconAnchor
+  });
+
   var base_map = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 21,
@@ -86,7 +98,7 @@
   {% endfor %}{% endif %}
 
   {% if stations %}{% for stat in stations %}
-  var stat_{{ stat.id }} =  L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}])
+  var stat_{{ stat.id }} =  L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}], {icon: cameraIcon})
     .bindPopup("<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5><img src=\"{% version stat.station_image.first.fb_image 'medium' %}\"><br><small>{{ stat.intro }}</small>");
   {% endfor %}{% endif %}
 
