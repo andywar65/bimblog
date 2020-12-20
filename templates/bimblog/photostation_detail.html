@@ -5,6 +5,7 @@
 
 {% block content %}
   {% include "bimblog/photostation_alerts.html" %}
+  {% include "bimblog/stationimage_alerts.html" %}
   <div class="row">
     <div class="col col-md-8">
       <h4><strong>{% translate "Photo station" %}: {{ stat.title }} @ <a href="{% url 'bimblog:building_detail' slug=stat.build.slug %}">{{ stat.build.title }}</a>
