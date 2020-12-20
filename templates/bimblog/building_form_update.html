@@ -74,6 +74,9 @@
     accessToken: '{{ mapbox_token }}'
   }).addTo(mymap);
 
+  var content = "<h5>{{ object.title }}</h5><img src=\"{% version object.fb_image 'medium' %}\">"
+  L.marker([{{ object.lat|unlocalize }}, {{ object.long|unlocalize }}]).bindPopup(content, {minWidth: 300}).addTo(mymap);
+
   function onMapClick(e) {
     var inputlat = document.getElementById("id_lat");
     var inputlong = document.getElementById("id_long");
