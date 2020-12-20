@@ -169,6 +169,13 @@ class StationImageCreateView( PermissionRequiredMixin, CreateView ):
         initial['stat'] = self.stat.id
         return initial
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'img_created' in self.request.GET:
+            context['img_created'] = self.request.GET['img_created']
+        elif 'img_modified' in self.request.GET:
+            context['img_modified'] = self.request.GET['img_modified']
+
     def get_success_url(self):
         if 'add_another' in self.request.POST:
             return (reverse('bimblog:image_add',
