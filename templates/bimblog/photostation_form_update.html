@@ -15,7 +15,7 @@
   <div class="col-md-2"></div>
   <div class="col-md-8">
     {% include "bimblog/photostation_alerts.html" %}
-    <h4><strong>{% translate "Modify photo station" %}</strong></h4>
+    <h4><strong>{% translate "Modify photo station" %}: {{ object.title }}</strong></h4>
     {% if perms.bimblog.change_photostation %}
     <div class="row">
       <div class="col col-md-8">
@@ -70,12 +70,12 @@
   {% endfor %}{% endif %}
 
   var mymap = L.map('mapid', {
-    center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
-    zoom: {{ build.zoom|unlocalize }},
+    center: [{{ object.build.lat|unlocalize }}, {{ object.build.long|unlocalize }}],
+    zoom: {{ object.build.zoom|unlocalize }},
     layers: [base_map, {% if plans.all %}plan_{{ plans.all.last.id }}{% endif %}]
   });
 
-  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}]).bindPopup("<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">").addTo(mymap);
+  L.marker([{{ object.build.lat|unlocalize }}, {{ object.build.long|unlocalize }}]).bindPopup("<h5>{{ object.build.title }}</h5><img src=\"{% version object.build.fb_image 'medium' %}\">").addTo(mymap);
 
   var baseMaps = {
     "Base": base_map

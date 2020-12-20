@@ -104,6 +104,13 @@ class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
             raise Http404(_("Station does not belong to Building"))
         return stat
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plans'] = self.build.building_plan.all()
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+
+        return context
+
     def get_success_url(self):
         if 'add_another' in self.request.POST:
             return (reverse('bimblog:station_create',
