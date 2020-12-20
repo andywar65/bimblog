@@ -61,7 +61,7 @@ class StationImageCreateForm(ModelForm):
 
     class Meta:
         model = StationImage
-        fields = ( 'stat', 'date', 'image', 'caption')
+        fields = ( 'image', 'stat', 'date', 'caption')
 
 class StationImageUpdateForm(ModelForm):
     stat = forms.ModelChoiceField( label=_('Photo station'),

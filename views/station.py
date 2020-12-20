@@ -84,7 +84,6 @@ class PhotoStationDetailView( PermissionRequiredMixin, DetailView):
         context['main_gal_slug'] = get_random_string(7)
         #gallery images
         context['images'] = self.object.station_image.all()
-
         return context
 
 class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
@@ -108,7 +107,6 @@ class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
         context = super().get_context_data(**kwargs)
         context['plans'] = self.build.building_plan.all()
         context['mapbox_token'] = settings.MAPBOX_TOKEN
-
         return context
 
     def get_success_url(self):
@@ -175,6 +173,7 @@ class StationImageCreateView( PermissionRequiredMixin, CreateView ):
             context['img_created'] = self.request.GET['img_created']
         elif 'img_modified' in self.request.GET:
             context['img_modified'] = self.request.GET['img_modified']
+        return context
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
