@@ -93,12 +93,12 @@
 
   {% if plans %}{% for plan in plans %}
   {% for obj in plan.geometry %}
-  var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %}}).bindPopup("{{ obj.popup }}");
+  var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %} }).bindPopup("{{ obj.popup }}");
   {% endfor %}
   {% endfor %}{% endif %}
 
   {% if stations %}{% for stat in stations %}
-  var content = "<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5><img src=\"{% version stat.station_image.first.fb_image 'medium' %}\"><br><small>{{ stat.intro }}</small>"
+  var content = "<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5>{% if stat.station_image.first %}<img src=\"{% version stat.station_image.first.fb_image 'medium' %}\">{% endif %}<br><small>{{ stat.intro }}</small>"
   var stat_{{ stat.id }} =  L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}], {icon: cameraIcon})
     .bindPopup( content, {minWidth: 300});
   {% endfor %}{% endif %}
