@@ -74,8 +74,14 @@
     accessToken: '{{ mapbox_token }}'
   }).addTo(mymap);
 
+  const buildMarker = L.divIcon({
+    html: '<i class="fa fa-building fa-2x" style="color: blue;"></i>',
+    iconSize: [20, 20],
+    className: 'build-marker'
+  });
+
   var content = "<h5>{{ object.title }}</h5><img src=\"{% version object.fb_image 'medium' %}\">"
-  L.marker([{{ object.lat|unlocalize }}, {{ object.long|unlocalize }}]).bindPopup(content, {minWidth: 300}).addTo(mymap);
+  L.marker([{{ object.lat|unlocalize }}, {{ object.long|unlocalize }}], {icon: buildMarker}).bindPopup(content, {minWidth: 300}).addTo(mymap);
 
   function onMapClick(e) {
     var inputlat = document.getElementById("id_lat");
