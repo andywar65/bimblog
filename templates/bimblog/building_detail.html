@@ -89,7 +89,7 @@
   {% if stations %}
   const statMarker = L.divIcon({
     html: '<i class="fa fa-camera fa-2x" style="color: red;"></i>',
-    iconSize: [20, 20],
+    iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
     className: 'stat-marker'
   });
   {% for stat in stations %}
@@ -114,7 +114,7 @@
 
   const buildMarker = L.divIcon({
     html: '<i class="fa fa-building fa-2x" style="color: blue;"></i>',
-    iconSize: [20, 20],
+    iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
     className: 'build-marker'
   });
 
