@@ -87,8 +87,14 @@
     layers: [base_map, {% if plans.all %}plan_{{ plans.all.last.id }}{% endif %}]
   });
 
+  const buildMarker = L.divIcon({
+    html: '<i class="fa fa-building fa-2x" style="color: blue;"></i>',
+    iconSize: [20, 20],
+    className: 'build-marker'
+  });
+
   var content = "<h5><a href=\"{% url 'bimblog:building_detail' slug=object.build.slug %}\">{{ object.build.title }}</a></h5><img src=\"{% version object.build.fb_image 'medium' %}\"><br><small>{{ object.build.intro }}</small>"
-  L.marker([{{ object.build.lat|unlocalize }}, {{ object.build.long|unlocalize }}]).addTo(mymap)
+  L.marker([{{ object.build.lat|unlocalize }}, {{ object.build.long|unlocalize }}], {icon: buildMarker}).addTo(mymap)
     .bindPopup(content, {minWidth: 300});
 
   var content = "<h5>{{ object.title }}</h5>{% if object.station_image.first %}<img src=\"{% version object.station_image.first.fb_image 'medium' %}\">{% endif %}<br><small>{{ object.intro }}</small>"
