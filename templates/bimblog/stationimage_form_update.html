@@ -29,8 +29,8 @@
       </p>
     {% endif %}
     <div class="row"><div class="col">
-        <img src="{% version object.fb_image 'small' %}"
-          alt="{{ object.caption }}">
+        <a href="{{ object.fb_image.url }}"><img src="{% version object.fb_image 'small' %}"
+          alt="{{ object.caption }}"></a>
     </div></div>
     <form action="" method="post" class="needs-validation" enctype="multipart/form-data" novalidate>
         {{ form|crispy }}
