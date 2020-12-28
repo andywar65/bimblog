@@ -17,7 +17,8 @@
   </div>
   <div class="col col-md-4 text-right">
     {% if perms.bimblog.add_building %}
-      <a class="btn btn-secondary" href="{% url 'bimblog:building_create' %}">{% translate "Add building" %}</a>
+      <a class="btn btn-secondary" href="{% url 'bimblog:building_create' %}" title="{% translate "Add building" %}">
+        + <i class="fa fa-building"></i></a>
     {% endif %}
   </div>
 </div>
