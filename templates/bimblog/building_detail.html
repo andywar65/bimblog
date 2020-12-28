@@ -22,10 +22,12 @@
   </div>
   <div class="col col-md-4 text-right">
     {% if perms.bimblog.add_buildingplan %}
-      <a class="btn btn-secondary" href="{% url 'bimblog:buildingplan_create' slug=build.slug %}">{% translate "Add building plan" %}</a>
+      <a class="btn btn-secondary" href="{% url 'bimblog:buildingplan_create' slug=build.slug %}" title="{% translate "Add building plan" %}">
+        + <i class="fa fa-map-o"></i></a>
     {% endif %}
     {% if perms.bimblog.add_photostation %}
-      <a class="btn btn-secondary" href="{% url 'bimblog:station_create' slug=build.slug %}">{% translate "Add photo station" %}</a>
+      <a class="btn btn-secondary" href="{% url 'bimblog:station_create' slug=build.slug %}" title="{% translate "Add photo station" %}">
+        + <i class="fa fa-camera"></i></a>
     {% endif %}
   </div>
 </div>
@@ -35,13 +37,15 @@
 </div>
 <div class="row">
   <div class="col-md-2"></div>
-  <div class="col-md-4">
+  <div class="col-md-4 ">
     {% if perms.bimblog.change_building %}
-      <a class="btn btn-primary" href="{% url 'bimblog:building_change' slug=build.slug %}">{% translate "Modify building" %}</a>
+      <a class="btn btn-primary" href="{% url 'bimblog:building_change' slug=build.slug %}" title="{% translate "Modify building" %}">
+        <i class="fa fa-pencil"></i> <i class="fa fa-building"></i></a>
     {% endif %}
   </div>
   <div class="col-md-4 text-right">
-    <a class="btn btn-secondary" href="{% url 'bimblog:building_list' %}">{% translate "Back to all buildings" %}</a>
+    <a class="btn btn-secondary" href="{% url 'bimblog:building_list' %}" title="{% translate "Back to all buildings" %}">
+      <i class="fa fa-angle-double-left"></i> <i class="fa fa-globe"></i></a>
   </div>
 </div>
 <div class="row">
