@@ -13,8 +13,15 @@
       <p><em>{{ stat.intro }}</em></p>
     </div>
     <div class="col col-md-4 text-right">
+      {% if reverse %}
+        <a class="btn btn-secondary" href="{% url 'bimblog:station_detail' build_slug=stat.build.slug stat_slug=stat.slug %}" title="{% translate "Bakcwards in time" %}">
+          <i class="fa fa-sort-numeric-desc"></i></a>
+      {% else %}
+        <a class="btn btn-secondary" href="{% url 'bimblog:station_detail' build_slug=stat.build.slug stat_slug=stat.slug %}?reverse=True" title="{% translate "Forwards in time" %}">
+          <i class="fa fa-sort-numeric-asc"></i></a>
+      {% endif %}
       {% if perms.bimblog.add_stationimage %}
-        <a class="btn btn-secondary" href="{% url 'bimblog:image_add' build_slug=stat.build.slug stat_slug=stat.slug %}" title="{% translate "Add image" %}">
+        <a class="btn btn-success" href="{% url 'bimblog:image_add' build_slug=stat.build.slug stat_slug=stat.slug %}" title="{% translate "Add image" %}">
          + <i class="fa fa-picture-o"></i></a>
       {% endif %}
     </div>
