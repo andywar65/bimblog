@@ -113,7 +113,9 @@
   var mymap = L.map('mapid', {
     center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
     zoom: {{ build.zoom|unlocalize }},
-    layers: [base_map, {% if plans %}plan_{{ plans.last.id }},{% endif %} {% if no_plan %}no_plan{% endif %}]
+    layers: [base_map,
+    {% if plans %}{% for plan in plans.reverse %}{% if plan.visible %}plan_{{ plan.id }},{% endif %}{% endfor %}{% endif %}
+    {% if no_plan %} no_plan{% endif %}]
   });
 
   const buildMarker = L.divIcon({
