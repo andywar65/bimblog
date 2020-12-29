@@ -85,6 +85,8 @@ class BuildingPlan(models.Model):
         null=True, blank=True )
     refresh = models.BooleanField(_("Refresh geometry"), default=True)
     geometry = models.JSONField( null=True, blank=True )
+    visible = models.BooleanField(_("Visible"), default=False,
+        help_text=_("Check if plan is immediately visible"))
 
     def __str__(self):
         return self.title + ' | ' + str(self.elev)
