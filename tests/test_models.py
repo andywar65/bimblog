@@ -48,6 +48,11 @@ class BuildingModelTest(TestCase):
         self.assertEquals(stat.intro,
             f'Another photo station by {settings.WEBSITE_NAME}!')
 
+    def test_station_maps(self):
+        stat = PhotoStation.objects.get(slug='station')
+        self.assertEquals(stat.lat, stat.build.lat )
+        self.assertEquals(stat.long, stat.build.long )
+
 @override_settings(MEDIA_ROOT=os.path.join(settings.MEDIA_ROOT, 'temp'))
 class StationImageTest(TestCase):
     @classmethod
