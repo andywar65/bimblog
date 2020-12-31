@@ -154,7 +154,7 @@ class StationImage(models.Model):
         null=True, blank=True, upload_to='uploads/buildings/images/')
     fb_image = FileBrowseField(_("Image"), max_length=200,
         extensions=[".jpg", ".png", ".jpeg", ".gif", ".tif", ".tiff"],
-        null=True, directory='images/buildings/images/')
+        null=True, directory='buildings/images/')
     caption = models.CharField(_("Caption"), max_length = 200, blank=True,
         null=True)
 

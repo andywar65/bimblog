@@ -48,32 +48,39 @@ class BuildingModelTest(TestCase):
         self.assertEquals(stat.intro,
             f'Another photo station by {settings.WEBSITE_NAME}!')
 
-#@override_settings(MEDIA_ROOT=os.path.join(settings.MEDIA_ROOT, 'temp'))
-#class StationImageTest(TestCase):
-    #@classmethod
-    #def setUpTestData(cls):
-        #build = Building.objects.create(title='Building', intro = 'Foo',
-            #body = 'Bar', site = 'Somewhere', category = 'ALT',
-            #type = 'ALT', status = 'ALT', cost = 'ALT', )
-        #stat = PhotoStation.objects.create(build=build, title='Station')
-        #img_path = os.path.join(settings.STATIC_ROOT,
-            #'portfolio/sample/image.jpg')
-        #with open(img_path, 'rb') as f:
-            #content = f.read()
-        #statimg = StationImage.objects.create(stat_id=stat.id,
-            #image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
+@override_settings(MEDIA_ROOT=os.path.join(settings.MEDIA_ROOT, 'temp'))
+class StationImageTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        img_path = os.path.join(settings.STATIC_ROOT,
+            'bimblog/images/image.jpg')
+        with open(img_path, 'rb') as f:
+            content = f.read()
+        build = Building.objects.create(title='Building',
+            image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
+        stat = PhotoStation.objects.create(build=build, title='Station')
+        #we get the same content, but name the image differently
+        statimg = StationImage.objects.create(stat_id=stat.id,
+            image=SimpleUploadedFile('image2.jpg', content, 'image/jpg'))
 
-    #def tearDown(self):
-        #"""Checks existing files, then removes them"""
-        #try:
-            #list = os.listdir(os.path.join(settings.MEDIA_ROOT,
-                #'uploads/images/galleries/'))
-        #except:
-            #return
-        #for file in list:
-            #os.remove(os.path.join(settings.MEDIA_ROOT,
-                #f'uploads/images/galleries/{file}'))
+    def tearDown(self):
+        """Checks existing files, then removes them"""
+        try:
+            list = os.listdir(os.path.join(settings.MEDIA_ROOT,
+                'uploads/buildings/images/'))
+        except:
+            return
+        for file in list:
+            os.remove(os.path.join(settings.MEDIA_ROOT,
+                f'uploads/buildings/images/{file}'))
 
-    #def test_stationimage_fb_image(self):
-        #image = StationImage.objects.get(image='uploads/images/galleries/image.jpg')
-        #self.assertEquals(image.fb_image.path, 'uploads/images/galleries/image.jpg')
+    def test_building_fb_image(self):
+        build = Building.objects.get(slug='building')
+        self.assertEquals(build.image, None)
+        self.assertEquals(build.fb_image.path, 'uploads/buildings/images/image.jpg')
+
+    def test_stationimage_fb_image(self):
+        stat = PhotoStation.objects.get(slug='station')
+        image = StationImage.objects.filter(stat_id=stat.id).first()
+        self.assertEquals(image.image, None)
+        self.assertEquals(image.fb_image.path, 'uploads/buildings/images/image2.jpg')
