@@ -17,8 +17,14 @@ class ProjectViewsTest(TestCase):
     """Testing all methods that don't need SimpleUploadedFile"""
     @classmethod
     def setUpTestData(cls):
-        build = Building.objects.create(title='Building', )
-        Building.objects.create(date=datetime.strptime('2020-05-09', '%Y-%m-%d'))
+        img_path = os.path.join(settings.STATIC_ROOT,
+            'bimblog/images/image.jpg')
+        with open(img_path, 'rb') as f:
+            content = f.read()
+        build = Building.objects.create(title='Building',
+            image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
+        Building.objects.create(date=datetime.strptime('2020-05-09', '%Y-%m-%d'),
+            image=SimpleUploadedFile('image2.jpg', content, 'image/jpg'))
         dxf_path = os.path.join(settings.STATIC_ROOT,
             'bimblog/dxf/sample.dxf')
         with open(dxf_path, 'rb') as d:
@@ -27,12 +33,8 @@ class ProjectViewsTest(TestCase):
             file=SimpleUploadedFile('plan1.dxf', content_d, 'text/dxf'))
         stat = PhotoStation.objects.create(build=build, title='Station')
         PhotoStation.objects.create(build=build, title='Station 2')
-        img_path = os.path.join(settings.STATIC_ROOT,
-            'bimblog/images/image.jpg')
-        with open(img_path, 'rb') as f:
-            content = f.read()
         StationImage.objects.create(stat_id=stat.id,
-            image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
+            image=SimpleUploadedFile('image3.jpg', content, 'image/jpg'))
         noviewer = User.objects.create_user(username='noviewer',
             password='P4s5W0r6')
         viewer = User.objects.create_user(username='viewer',
@@ -79,3 +81,17 @@ class ProjectViewsTest(TestCase):
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 403)
+
+    def test_list_and_detail_status_code_ok(self):
+        self.client.post(reverse('front_login'), {'username':'viewer',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        response = self.client.get(reverse('bimblog:building_list'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:building_detail',
+            kwargs={'slug': 'building'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:station_detail',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
