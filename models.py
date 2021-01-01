@@ -98,10 +98,11 @@ class BuildingPlan(models.Model):
         #upload file
         super(BuildingPlan, self).save(*args, **kwargs)
         if self.refresh:
-            self.geometry = workflow(self.file, self.build.lat, self.build.long)
-            self.refresh = False
-            #save geometry
-            super(BuildingPlan, self).save(*args, **kwargs)
+            geometry = workflow(self.file, self.build.lat, self.build.long)
+            #this is a sloppy workaround to make working test
+            #geometry refreshed
+            BuildingPlan.objects.filter(id=self.id).update(geometry=geometry,
+                refresh=False)
 
     class Meta:
         verbose_name = _('Building plan')

@@ -61,8 +61,14 @@ class StationImageTest(TestCase):
             'bimblog/images/image.jpg')
         with open(img_path, 'rb') as f:
             content = f.read()
+        dxf_path = os.path.join(settings.STATIC_ROOT,
+            'bimblog/dxf/sample.dxf')
+        with open(dxf_path, 'rb') as d:
+            content_d = d.read()
         build = Building.objects.create(title='Building',
             image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
+        BuildingPlan.objects.create(build=build, title='Plan 1',
+            file=SimpleUploadedFile('plan1.dxf', content_d, 'text/dxf'))
         stat = PhotoStation.objects.create(build=build, title='Station')
         #we get the same content, but name the image differently
         statimg = StationImage.objects.create(stat_id=stat.id,
@@ -78,6 +84,18 @@ class StationImageTest(TestCase):
         for file in list:
             os.remove(os.path.join(settings.MEDIA_ROOT,
                 f'uploads/buildings/images/{file}'))
+        try:
+            list = os.listdir(os.path.join(settings.MEDIA_ROOT,
+                'uploads/buildings/plans/dxf/'))
+        except:
+            return
+        for file in list:
+            os.remove(os.path.join(settings.MEDIA_ROOT,
+                f'uploads/buildings/plans/dxf/{file}'))
+
+    def test_buildingplan_str_method(self):
+        plan = BuildingPlan.objects.get(title='Plan 1')
+        self.assertEquals(plan.__str__(), 'Plan 1 | 0.0')
 
     def test_building_fb_image(self):
         build = Building.objects.get(slug='building')
