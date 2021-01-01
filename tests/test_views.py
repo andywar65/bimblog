@@ -13,7 +13,7 @@ from users.models import User
 
 @override_settings(USE_I18N=False)
 @override_settings(MEDIA_ROOT=os.path.join(settings.MEDIA_ROOT, 'temp'))
-class ProjectViewsTest(TestCase):
+class BuildingViewsTest(TestCase):
     """Testing all methods that don't need SimpleUploadedFile"""
     @classmethod
     def setUpTestData(cls):
@@ -23,7 +23,7 @@ class ProjectViewsTest(TestCase):
             content = f.read()
         build = Building.objects.create(title='Building',
             image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
-        Building.objects.create(date=datetime.strptime('2020-05-09', '%Y-%m-%d'),
+        Building.objects.create(title='Building 2',
             image=SimpleUploadedFile('image2.jpg', content, 'image/jpg'))
         dxf_path = os.path.join(settings.STATIC_ROOT,
             'bimblog/dxf/sample.dxf')
@@ -46,7 +46,7 @@ class ProjectViewsTest(TestCase):
             'view_photostation', 'view_stationimage'])
         for p in permissions:
             viewer.user_permissions.add(p)
-        group = Group.objects.get(name='Project Manager')
+        group = Group.objects.get(name='Building Manager')
         adder.groups.add(group)
 
     def tearDown(self):
@@ -94,4 +94,122 @@ class ProjectViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_status_code_forbidden(self):
+        self.client.post(reverse('front_login'), {'username':'viewer',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        response = self.client.get(reverse('bimblog:building_create'))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:buildingplan_create',
+            kwargs={'slug': 'building'}))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:station_create',
+            kwargs={'slug': 'building'}))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:image_add',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_status_code_ok(self):
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        response = self.client.get(reverse('bimblog:building_create'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:buildingplan_create',
+            kwargs={'slug': 'building'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:station_create',
+            kwargs={'slug': 'building'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:image_add',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_update_status_code_forbidden(self):
+        self.client.post(reverse('front_login'), {'username':'viewer',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
+        image = StationImage.objects.get(stat_id=stat.id)
+        response = self.client.get(reverse('bimblog:building_change',
+            kwargs={'slug': 'building' }))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:buildingplan_change',
+            kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:station_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:image_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_status_code_ok(self):
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
+        image = StationImage.objects.get(stat_id=stat.id)
+        response = self.client.get(reverse('bimblog:building_change',
+            kwargs={'slug': 'building' }))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:buildingplan_change',
+            kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:station_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:image_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_status_code_forbidden(self):
+        self.client.post(reverse('front_login'), {'username':'viewer',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
+        image = StationImage.objects.get(stat_id=stat.id)
+        response = self.client.get(reverse('bimblog:building_delete',
+            kwargs={'slug': 'building' }))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:buildingplan_delete',
+            kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:station_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('bimblog:image_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_status_code_ok(self):
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        stat = PhotoStation.objects.get(slug='station')
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
+        image = StationImage.objects.get(stat_id=stat.id)
+        response = self.client.get(reverse('bimblog:building_delete',
+            kwargs={'slug': 'building' }))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:buildingplan_delete',
+            kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:station_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:image_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': image.id}))
         self.assertEqual(response.status_code, 200)
