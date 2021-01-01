@@ -23,7 +23,7 @@ class BuildingViewsTest(TestCase):
             content = f.read()
         build = Building.objects.create(title='Building',
             image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
-        Building.objects.create(title='Building 2',
+        build2 = Building.objects.create(title='Building 2',
             image=SimpleUploadedFile('image2.jpg', content, 'image/jpg'))
         dxf_path = os.path.join(settings.STATIC_ROOT,
             'bimblog/dxf/sample.dxf')
@@ -32,7 +32,7 @@ class BuildingViewsTest(TestCase):
         BuildingPlan.objects.create(build=build, title='Plan 1',
             file=SimpleUploadedFile('plan1.dxf', content_d, 'text/dxf'))
         stat = PhotoStation.objects.create(build=build, title='Station')
-        PhotoStation.objects.create(build=build, title='Station 2')
+        PhotoStation.objects.create(build=build2, title='Station 2')
         StationImage.objects.create(stat_id=stat.id,
             image=SimpleUploadedFile('image3.jpg', content, 'image/jpg'))
         noviewer = User.objects.create_user(username='noviewer',
@@ -198,11 +198,14 @@ class BuildingViewsTest(TestCase):
             'pk': image.id}))
         self.assertEqual(response.status_code, 200)
 
-    def test_wrong_building_status_code(self):
+    def test_wrong_parent_status_code(self):
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
+        response = self.client.get(reverse('bimblog:station_detail',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 404)
         response = self.client.get(reverse('bimblog:image_add',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 404)
@@ -224,5 +227,13 @@ class BuildingViewsTest(TestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.get(reverse('bimblog:image_delete',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:image_change',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station-2',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:image_delete',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station-2',
             'pk': image.id}))
         self.assertEqual(response.status_code, 404)
