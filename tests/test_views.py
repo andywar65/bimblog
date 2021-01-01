@@ -71,8 +71,6 @@ class BuildingViewsTest(TestCase):
     def test_list_and_detail_status_code_forbidden(self):
         self.client.post(reverse('front_login'), {'username':'noviewer',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
-        stat = PhotoStation.objects.get(slug='station')
         response = self.client.get(reverse('bimblog:building_list'))
         self.assertEqual(response.status_code, 403)
         response = self.client.get(reverse('bimblog:building_detail',
@@ -85,8 +83,6 @@ class BuildingViewsTest(TestCase):
     def test_list_and_detail_status_code_ok(self):
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
-        stat = PhotoStation.objects.get(slug='station')
         response = self.client.get(reverse('bimblog:building_list'))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('bimblog:building_detail',
@@ -99,8 +95,6 @@ class BuildingViewsTest(TestCase):
     def test_create_status_code_forbidden(self):
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
-        stat = PhotoStation.objects.get(slug='station')
         response = self.client.get(reverse('bimblog:building_create'))
         self.assertEqual(response.status_code, 403)
         response = self.client.get(reverse('bimblog:buildingplan_create',
@@ -116,8 +110,6 @@ class BuildingViewsTest(TestCase):
     def test_create_status_code_ok(self):
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
-        stat = PhotoStation.objects.get(slug='station')
         response = self.client.get(reverse('bimblog:building_create'))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('bimblog:buildingplan_create',
@@ -133,9 +125,7 @@ class BuildingViewsTest(TestCase):
     def test_update_status_code_forbidden(self):
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
         stat = PhotoStation.objects.get(slug='station')
-        plan = BuildingPlan.objects.get(slug='plan-1-0')
         image = StationImage.objects.get(stat_id=stat.id)
         response = self.client.get(reverse('bimblog:building_change',
             kwargs={'slug': 'building' }))
@@ -154,9 +144,7 @@ class BuildingViewsTest(TestCase):
     def test_update_status_code_ok(self):
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
         stat = PhotoStation.objects.get(slug='station')
-        plan = BuildingPlan.objects.get(slug='plan-1-0')
         image = StationImage.objects.get(stat_id=stat.id)
         response = self.client.get(reverse('bimblog:building_change',
             kwargs={'slug': 'building' }))
@@ -175,9 +163,7 @@ class BuildingViewsTest(TestCase):
     def test_delete_status_code_forbidden(self):
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
         stat = PhotoStation.objects.get(slug='station')
-        plan = BuildingPlan.objects.get(slug='plan-1-0')
         image = StationImage.objects.get(stat_id=stat.id)
         response = self.client.get(reverse('bimblog:building_delete',
             kwargs={'slug': 'building' }))
@@ -196,9 +182,7 @@ class BuildingViewsTest(TestCase):
     def test_delete_status_code_ok(self):
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
-        build = Building.objects.get(slug='building')
         stat = PhotoStation.objects.get(slug='station')
-        plan = BuildingPlan.objects.get(slug='plan-1-0')
         image = StationImage.objects.get(stat_id=stat.id)
         response = self.client.get(reverse('bimblog:building_delete',
             kwargs={'slug': 'building' }))
@@ -213,3 +197,32 @@ class BuildingViewsTest(TestCase):
             kwargs={'build_slug': 'building', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 200)
+
+    def test_wrong_building_status_code(self):
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        stat = PhotoStation.objects.get(slug='station')
+        image = StationImage.objects.get(stat_id=stat.id)
+        response = self.client.get(reverse('bimblog:image_add',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:buildingplan_change',
+            kwargs={'build_slug': 'building-2', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:station_change',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:image_change',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:buildingplan_delete',
+            kwargs={'build_slug': 'building-2', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:station_delete',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('bimblog:image_delete',
+            kwargs={'build_slug': 'building-2', 'stat_slug': 'station',
+            'pk': image.id}))
+        self.assertEqual(response.status_code, 404)
