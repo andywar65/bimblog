@@ -94,8 +94,26 @@ class StationImageTest(TestCase):
                 f'uploads/buildings/plans/dxf/{file}'))
 
     def test_buildingplan_str_method(self):
-        plan = BuildingPlan.objects.get(title='Plan 1')
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
         self.assertEquals(plan.__str__(), 'Plan 1 | 0.0')
+
+    def test_buildingplan_geometry(self):
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
+        geometry = [{'type': 'polygon', 'color': '#999999',
+        'popup': 'Porticato',
+        'coords': [[41.89830800279919, 12.545726001278254],
+        [41.89827524195551, 12.545717364542545],
+        [41.89823424354996, 12.545635389111553],
+        [41.89841413674754, 12.545472980512894],
+        [41.89846830605199, 12.54558129087325]]},
+        {'type': 'polygon', 'color': '#ffbf00', 'popup': 'Aule tecniche',
+        'coords': [[41.89823424354996, 12.545635389111553],
+        [41.89802207569236, 12.545211164038943],
+        [41.89802550424858, 12.545187689834192],
+        [41.89819807177193, 12.5450355472492],
+        [41.89823418464156, 12.545107754156103],
+        [41.8984160029088, 12.545471295874886]]}]
+        self.assertEquals(plan.geometry, geometry)
 
     def test_building_fb_image(self):
         build = Building.objects.get(slug='building')
