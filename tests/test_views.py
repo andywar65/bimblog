@@ -1,5 +1,5 @@
-import os
 from datetime import datetime
+from pathlib import Path
 
 from django.conf import settings
 from django.test import TestCase, override_settings
@@ -12,12 +12,12 @@ from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from users.models import User
 
 @override_settings(USE_I18N=False)
-@override_settings(MEDIA_ROOT=os.path.join(settings.MEDIA_ROOT, 'temp'))
+@override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT / 'temp'))
 class BuildingViewsTest(TestCase):
     """Testing all methods that don't need SimpleUploadedFile"""
     @classmethod
     def setUpTestData(cls):
-        img_path = os.path.join(settings.STATIC_ROOT,
+        img_path = Path(settings.STATIC_ROOT /
             'bimblog/images/image.jpg')
         with open(img_path, 'rb') as f:
             content = f.read()
@@ -25,7 +25,7 @@ class BuildingViewsTest(TestCase):
             image=SimpleUploadedFile('image.jpg', content, 'image/jpg'))
         build2 = Building.objects.create(title='Building 2',
             image=SimpleUploadedFile('image2.jpg', content, 'image/jpg'))
-        dxf_path = os.path.join(settings.STATIC_ROOT,
+        dxf_path = Path(settings.STATIC_ROOT /
             'bimblog/dxf/sample.dxf')
         with open(dxf_path, 'rb') as d:
             content_d = d.read()
@@ -51,22 +51,17 @@ class BuildingViewsTest(TestCase):
 
     def tearDown(self):
         """Checks existing files, then removes them"""
-        try:
-            list = os.listdir(os.path.join(settings.MEDIA_ROOT,
-                'uploads/buildings/images/'))
-        except:
-            return
+        path = Path(settings.MEDIA_ROOT /
+            'uploads/buildings/images/')
+        list = [e for e in path.iterdir() if e.is_file()]
+        print(list)
         for file in list:
-            os.remove(os.path.join(settings.MEDIA_ROOT,
-                f'uploads/buildings/images/{file}'))
-        try:
-            list = os.listdir(os.path.join(settings.MEDIA_ROOT,
-                'uploads/buildings/plans/dxf/'))
-        except:
-            return
+            Path(file).unlink()
+        path = Path(settings.MEDIA_ROOT /
+            'uploads/buildings/plans/dxf/')
+        list = [e for e in path.iterdir() if e.is_file()]
         for file in list:
-            os.remove(os.path.join(settings.MEDIA_ROOT,
-                f'uploads/buildings/plans/dxf/{file}'))
+            Path(file).unlink()
 
     def test_list_and_detail_status_code_forbidden(self):
         self.client.post(reverse('front_login'), {'username':'noviewer',
@@ -241,48 +236,48 @@ class BuildingViewsTest(TestCase):
     def test_building_crud(self):
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
-        img_path = os.path.join(settings.STATIC_ROOT,
+        img_path = Path(settings.STATIC_ROOT /
             'bimblog/images/image.jpg')
         with open(img_path, 'rb') as f:
             content = f.read()
         response = self.client.post(reverse('bimblog:building_create'),
-            {'title': 'Building 3',
+            {'title': 'Building 4',
             'image': SimpleUploadedFile('image4.jpg', content, 'image/jpg'),
             'intro': 'foo', 'date': '2020-05-09',
             'address': '', 'lat': 40, 'long': 20, 'zoom': 10},
             follow = True)
         self.assertRedirects(response,
             reverse('bimblog:building_detail',
-                kwargs={'slug': 'building-3'})+'?created=Building 3',
+                kwargs={'slug': 'building-4'})+'?created=Building 4',
             status_code=302,
             target_status_code = 200)#302 is first step of redirect chain
         response = self.client.post(reverse('bimblog:building_create'),
-            {'title': 'Building 4',
+            {'title': 'Building 5',
             'image': SimpleUploadedFile('image5.jpg', content, 'image/jpg'),
             'intro': 'foo', 'date': '2020-05-09',
             'address': '', 'lat': 40, 'long': 20, 'zoom': 10, 'add_another': ''},
             follow = True)
         self.assertRedirects(response,
-            reverse('bimblog:building_create')+'?created=Building 4',
+            reverse('bimblog:building_create')+'?created=Building 5',
             status_code=302,
             target_status_code = 200)#302 is first step of redirect chain
         response = self.client.post(reverse('bimblog:building_change',
-            kwargs={'slug': 'building-3'}),
-            {'title': 'Building 3',
+            kwargs={'slug': 'building-4'}),
+            {'title': 'Building 4',
             'image': '',
             'intro': 'foo', 'date': '2020-05-09',
             'address': 'Here', 'lat': 40, 'long': 20, 'zoom': 10},
             follow = True)
         self.assertRedirects(response,
             reverse('bimblog:building_detail',
-                kwargs={'slug': 'building-3'})+'?modified=Building 3',
+                kwargs={'slug': 'building-4'})+'?modified=Building 4',
             status_code=302,
             target_status_code = 200)#302 is first step of redirect chain
         response = self.client.post(reverse('bimblog:building_delete',
-            kwargs={'slug': 'building-3'}),
+            kwargs={'slug': 'building-4'}),
             {'delete': True},
             follow = True)
         self.assertRedirects(response,
-            reverse('bimblog:building_list')+'?deleted=Building 3',
+            reverse('bimblog:building_list')+'?deleted=Building 4',
             status_code=302,
             target_status_code = 200)#302 is first step of redirect chain
