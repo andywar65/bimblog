@@ -11,12 +11,26 @@ from django.contrib.contenttypes.models import ContentType
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from users.models import User
 
-@override_settings(USE_I18N=False)
+@override_settings(USE_I18N=False)#not working
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT / 'temp'))
 class BuildingViewsTest(TestCase):
-    """Testing all methods that don't need SimpleUploadedFile"""
     @classmethod
     def setUpTestData(cls):
+        noviewer = User.objects.create_user(username='noviewer',
+            password='P4s5W0r6')
+        viewer = User.objects.create_user(username='viewer',
+            password='P4s5W0r6')
+        adder = User.objects.create_user(username='adder',
+            password='P4s5W0r6')
+        permissions = Permission.objects.filter(
+            codename__in=['view_building', 'view_buildingplan',
+            'view_photostation', 'view_stationimage'])
+        for p in permissions:
+            viewer.user_permissions.add(p)
+        group = Group.objects.get(name='Building Manager')
+        adder.groups.add(group)
+
+    def setUp(self):
         img_path = Path(settings.STATIC_ROOT /
             'bimblog/images/image.jpg')
         with open(img_path, 'rb') as f:
@@ -35,26 +49,12 @@ class BuildingViewsTest(TestCase):
         PhotoStation.objects.create(build=build2, title='Station 2')
         StationImage.objects.create(stat_id=stat.id,
             image=SimpleUploadedFile('image3.jpg', content, 'image/jpg'))
-        noviewer = User.objects.create_user(username='noviewer',
-            password='P4s5W0r6')
-        viewer = User.objects.create_user(username='viewer',
-            password='P4s5W0r6')
-        adder = User.objects.create_user(username='adder',
-            password='P4s5W0r6')
-        permissions = Permission.objects.filter(
-            codename__in=['view_building', 'view_buildingplan',
-            'view_photostation', 'view_stationimage'])
-        for p in permissions:
-            viewer.user_permissions.add(p)
-        group = Group.objects.get(name='Building Manager')
-        adder.groups.add(group)
 
     def tearDown(self):
         """Checks existing files, then removes them"""
         path = Path(settings.MEDIA_ROOT /
             'uploads/buildings/images/')
         list = [e for e in path.iterdir() if e.is_file()]
-        print(list)
         for file in list:
             Path(file).unlink()
         path = Path(settings.MEDIA_ROOT /
@@ -179,19 +179,20 @@ class BuildingViewsTest(TestCase):
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
-        response = self.client.get(reverse('bimblog:building_delete',
-            kwargs={'slug': 'building' }))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('bimblog:buildingplan_delete',
-            kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('bimblog:station_delete',
-            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
-        self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('bimblog:image_delete',
             kwargs={'build_slug': 'building', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:station_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:buildingplan_delete',
+            kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('bimblog:building_delete',
+            kwargs={'slug': 'building' }))
+        self.assertEqual(response.status_code, 200)
+
 
     def test_wrong_parent_status_code(self):
         self.client.post(reverse('front_login'), {'username':'adder',
