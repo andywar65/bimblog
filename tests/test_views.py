@@ -238,51 +238,51 @@ class BuildingViewsTest(TestCase):
             'pk': image.id}))
         self.assertEqual(response.status_code, 404)
 
-def test_building_crud(self):
-    self.client.post(reverse('front_login'), {'username':'adder',
-        'password':'P4s5W0r6'})
-    img_path = os.path.join(settings.STATIC_ROOT,
-        'bimblog/images/image.jpg')
-    with open(img_path, 'rb') as f:
-        content = f.read()
-    response = self.client.post(reverse('bimblog:building_create'),
-        {'title': 'Building 3',
-        'image': SimpleUploadedFile('image4.jpg', content, 'image/jpg'),
-        'intro': 'foo', 'date': '2020-05-09',
-        'address': '', 'lat': 40, 'long': 20, 'zoom': 10},
-        follow = True)
-    self.assertRedirects(response,
-        reverse('bimblog:building_detail',
-            kwargs={'slug': 'building-3'})+'?created=Building 3',
-        status_code=302,
-        target_status_code = 200)#302 is first step of redirect chain
-    response = self.client.post(reverse('bimblog:building_create'),
-        {'title': 'Building 4',
-        'image': SimpleUploadedFile('image5.jpg', content, 'image/jpg'),
-        'intro': 'foo', 'date': '2020-05-09',
-        'address': '', 'lat': 40, 'long': 20, 'zoom': 10, 'add_another': ''},
-        follow = True)
-    self.assertRedirects(response,
-        reverse('bimblog:building_create')+'?created=Building 4',
-        status_code=302,
-        target_status_code = 200)#302 is first step of redirect chain
-    response = self.client.post(reverse('bimblog:building_change',
-        kwargs={'slug': 'building-3'}),
-        {'title': 'Building 3',
-        'image': '',
-        'intro': 'foo', 'date': '2020-05-09',
-        'address': 'Here', 'lat': 40, 'long': 20, 'zoom': 10},
-        follow = True)
-    self.assertRedirects(response,
-        reverse('bimblog:building_detail',
-            kwargs={'slug': 'building-3'})+'?modified=Building 3',
-        status_code=302,
-        target_status_code = 200)#302 is first step of redirect chain
-    response = self.client.post(reverse('bimblog:building_delete',
-        kwargs={'slug': 'building-3'}),
-        {'delete': True},
-        follow = True)
-    self.assertRedirects(response,
-        reverse('bimblog:building_list')+'?deleted=Building 3',
-        status_code=302,
-        target_status_code = 200)#302 is first step of redirect chain
+    def test_building_crud(self):
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        img_path = os.path.join(settings.STATIC_ROOT,
+            'bimblog/images/image.jpg')
+        with open(img_path, 'rb') as f:
+            content = f.read()
+        response = self.client.post(reverse('bimblog:building_create'),
+            {'title': 'Building 3',
+            'image': SimpleUploadedFile('image4.jpg', content, 'image/jpg'),
+            'intro': 'foo', 'date': '2020-05-09',
+            'address': '', 'lat': 40, 'long': 20, 'zoom': 10},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building-3'})+'?created=Building 3',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
+        response = self.client.post(reverse('bimblog:building_create'),
+            {'title': 'Building 4',
+            'image': SimpleUploadedFile('image5.jpg', content, 'image/jpg'),
+            'intro': 'foo', 'date': '2020-05-09',
+            'address': '', 'lat': 40, 'long': 20, 'zoom': 10, 'add_another': ''},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_create')+'?created=Building 4',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
+        response = self.client.post(reverse('bimblog:building_change',
+            kwargs={'slug': 'building-3'}),
+            {'title': 'Building 3',
+            'image': '',
+            'intro': 'foo', 'date': '2020-05-09',
+            'address': 'Here', 'lat': 40, 'long': 20, 'zoom': 10},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building-3'})+'?modified=Building 3',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
+        response = self.client.post(reverse('bimblog:building_delete',
+            kwargs={'slug': 'building-3'}),
+            {'delete': True},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_list')+'?deleted=Building 3',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
