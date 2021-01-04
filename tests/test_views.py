@@ -438,8 +438,80 @@ class BuildingViewsTest(TestCase):
             status_code=302,
             target_status_code = 200)
 
-        def test_stationimage_crud_redirect(self):
-            print("\n-Test StationImage CrUD correct redirection")
-            self.client.post(reverse('front_login'), {'username':'adder',
-                'password':'P4s5W0r6'})
-            stat = PhotoStation.objects.get(slug='station')
+    def test_stationimage_crud_redirect(self):
+        print("\n-Test StationImage CrUD correct redirection")
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        stat = PhotoStation.objects.get(slug='station')
+        img_path = Path(settings.STATIC_ROOT /
+            'bimblog/images/image.jpg')
+        with open(img_path, 'rb') as f:
+            content = f.read()
+        print("--Create Image")
+        response = self.client.post(reverse('bimblog:image_add',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}),
+            {'stat': stat.id, 'date': '2021-01-04',
+            'image': SimpleUploadedFile('image6.jpg', content, 'image/jpg'),
+            'caption': 'Footy Foo' },
+            follow = True)
+        img = StationImage.objects.get(caption='Footy Foo')
+        self.assertRedirects(response,
+            reverse('bimblog:station_detail',
+                kwargs={'build_slug': 'building',
+                'stat_slug': 'station'})+f'?img_created={img.id}',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
+        print("--Create Image and add another")
+        response = self.client.post(reverse('bimblog:image_add',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station'}),
+            {'stat': stat.id, 'date': '2021-01-04',
+            'image': SimpleUploadedFile('image7.jpg', content, 'image/jpg'),
+            'caption': 'Barry bar', 'add_another': '' },
+            follow = True)
+        img = StationImage.objects.get(caption='Barry bar')
+        self.assertRedirects(response,
+            reverse('bimblog:image_add',
+                kwargs={'build_slug': 'building',
+                'stat_slug': 'station'})+f'?img_created={img.id}',
+            status_code=302,
+            target_status_code = 200)
+        print("--Modify Image")
+        response = self.client.post(reverse('bimblog:image_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': img.id}),
+            {'stat': stat.id, 'date': '2021-01-04',
+            'image': SimpleUploadedFile('image8.jpg', content, 'image/jpg'),
+            'caption': 'Barry bar' },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:station_detail',
+                kwargs={'build_slug': 'building',
+                'stat_slug': 'station'})+f'?img_modified={img.id}',
+            status_code=302,
+            target_status_code = 200)
+        print("--Modify Image and add another")
+        response = self.client.post(reverse('bimblog:image_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': img.id}),
+            {'stat': stat.id, 'date': '2021-01-04',
+            'image': SimpleUploadedFile('image9.jpg', content, 'image/jpg'),
+            'caption': 'Barry bar', 'add_another': '' },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:image_add',
+                kwargs={'build_slug': 'building',
+                'stat_slug': 'station'})+f'?img_modified={img.id}',
+            status_code=302,
+            target_status_code = 200)
+        print("--Delete Image")
+        response = self.client.post(reverse('bimblog:image_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'station',
+            'pk': img.id}),
+            {'delete': True},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:station_detail',
+                kwargs={'build_slug': 'building',
+                'stat_slug': 'station'})+f'?img_deleted={img.id}',
+            status_code=302,
+            target_status_code = 200)

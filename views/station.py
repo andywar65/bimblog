@@ -236,10 +236,11 @@ class StationImageDeleteView(PermissionRequiredMixin, FormView):
             raise Http404(_("Station does not belong to Building"))
         if not self.stat == self.img.stat:
             raise Http404(_("Image does not belong to Photo Station"))
+        self.title = self.img.id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.img.id
+        context['title'] = self.title
         return context
 
     def form_valid(self, form):
@@ -249,7 +250,7 @@ class StationImageDeleteView(PermissionRequiredMixin, FormView):
     def get_success_url(self):
         return (reverse('bimblog:station_detail',
             kwargs={'build_slug': self.build.slug, 'stat_slug': self.stat.slug}) +
-            f'?img_deleted={self.img.id}')
+            f'?img_deleted={self.title}')
 
 class StationImageDayArchiveView( PermissionRequiredMixin, DayArchiveView ):
     model = StationImage
