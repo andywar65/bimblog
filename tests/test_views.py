@@ -16,6 +16,7 @@ from users.models import User
 class BuildingViewsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
+        print("Test bimblog views")
         noviewer = User.objects.create_user(username='noviewer',
             password='P4s5W0r6')
         viewer = User.objects.create_user(username='viewer',
@@ -64,13 +65,17 @@ class BuildingViewsTest(TestCase):
             Path(file).unlink()
 
     def test_list_and_detail_status_code_forbidden(self):
+        print("\n-Test bimblog forbidden")
         self.client.post(reverse('front_login'), {'username':'noviewer',
             'password':'P4s5W0r6'})
+        print("--Test building list forbidden")
         response = self.client.get(reverse('bimblog:building_list'))
         self.assertEqual(response.status_code, 403)
+        print("--Test building detail forbidden")
         response = self.client.get(reverse('bimblog:building_detail',
             kwargs={'slug': 'building'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test station detail forbidden")
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 403)
@@ -234,8 +239,8 @@ class BuildingViewsTest(TestCase):
             'pk': image.id}))
         self.assertEqual(response.status_code, 404)
 
-    def test_building_crud(self):
-        print("Test correct redirection")
+    def test_building_crud_redirect(self):
+        print("-Test Building CrUD correct redirection")
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
         img_path = Path(settings.STATIC_ROOT /
@@ -298,5 +303,75 @@ class BuildingViewsTest(TestCase):
             follow = True)
         self.assertRedirects(response,
             reverse('bimblog:building_list')+'?deleted=Building 4',
+            status_code=302,
+            target_status_code = 200)
+
+    def test_buildingplan_crud_redirect(self):
+        print("\n-Test BuildingPlan CrUD correct redirection")
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        dxf_path = Path(settings.STATIC_ROOT /
+            'bimblog/dxf/sample.dxf')
+        with open(dxf_path, 'rb') as d:
+            content_d = d.read()
+        print("--Create building plan")
+        response = self.client.post(reverse('bimblog:buildingplan_create',
+            kwargs={'slug': 'building'}),
+            {'build': build.id, 'title': 'Created plan', 'elev': 3.0,
+            'file': SimpleUploadedFile('plan2.dxf', content_d, 'txt/dxf'),
+            'refresh': True, 'geometry': '', 'visible': True },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building'})+'?plan_created=Created plan',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
+        print("--Create building plan and add another")
+        response = self.client.post(reverse('bimblog:buildingplan_create',
+            kwargs={'slug': 'building'}),
+            {'build': build.id, 'title': 'Created plan add', 'elev': 6.0,
+            'file': SimpleUploadedFile('plan3.dxf', content_d, 'txt/dxf'),
+            'refresh': True, 'geometry': '', 'visible': True,
+            'add_another': '' },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:buildingplan_create',
+                kwargs={'slug': 'building'})+'?plan_created=Created plan add',
+            status_code=302,
+            target_status_code = 200)
+        print("--Modify building plan")
+        response = self.client.post(reverse('bimblog:buildingplan_change',
+            kwargs={'build_slug': 'building', 'plan_slug': 'created-plan-30'}),
+            {'build': build.id, 'title': 'Created plan', 'elev': 3.0,
+            'file': SimpleUploadedFile('plan4.dxf', content_d, 'txt/dxf'),
+            'refresh': True, 'geometry': '', 'visible': True },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building'})+'?plan_modified=Created plan',
+            status_code=302,
+            target_status_code = 200)
+        print("--Modify building plan and add another")
+        response = self.client.post(reverse('bimblog:buildingplan_change',
+            kwargs={'build_slug': 'building',
+            'plan_slug': 'created-plan-add-60'}),
+            {'build': build.id, 'title': 'Created plan add', 'elev': 6.0,
+            'file': SimpleUploadedFile('plan5.dxf', content_d, 'txt/dxf'),
+            'refresh': True, 'geometry': '', 'visible': True },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building'})+'?plan_modified=Created plan add',
+            status_code=302,
+            target_status_code = 200)
+        print("--Delete building plan")
+        response = self.client.post(reverse('bimblog:buildingplan_delete',
+            kwargs={'build_slug': 'building', 'plan_slug': 'created-plan-30'}),
+            {'delete': True},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building'})+'?plan_deleted=Created plan',
             status_code=302,
             target_status_code = 200)
