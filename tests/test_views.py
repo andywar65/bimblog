@@ -49,7 +49,9 @@ class BuildingViewsTest(TestCase):
         stat = PhotoStation.objects.create(build=build, title='Station')
         PhotoStation.objects.create(build=build2, title='Station 2')
         StationImage.objects.create(stat_id=stat.id,
-            image=SimpleUploadedFile('image3.jpg', content, 'image/jpg'))
+            image=SimpleUploadedFile('image3.jpg', content, 'image/jpg'),
+            date=datetime.strptime('2020-05-09 12:00:00',
+                '%Y-%m-%d %H:%M:%S'))
 
     def tearDown(self):
         """Checks existing files, then removes them"""
@@ -79,6 +81,10 @@ class BuildingViewsTest(TestCase):
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test image day forbidden")
+        response = self.client.get(reverse('bimblog:image_day',
+            kwargs={'slug': 'building', 'year': 2020, 'month': 5, 'day': 9}))
+        self.assertEqual(response.status_code, 403)
 
     def test_list_and_detail_status_code_ok(self):
         print("\n-Test bimblog ok")
@@ -94,6 +100,10 @@ class BuildingViewsTest(TestCase):
         print("--Test station detail ok")
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
+        self.assertEqual(response.status_code, 200)
+        print("--Test image day ok")
+        response = self.client.get(reverse('bimblog:image_day',
+            kwargs={'slug': 'building', 'year': 2020, 'month': 5, 'day': 9}))
         self.assertEqual(response.status_code, 200)
 
     def test_create_status_code_forbidden(self):
@@ -117,132 +127,168 @@ class BuildingViewsTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_create_status_code_ok(self):
+        print("\n-Test bimblog create ok")
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
+        print("--Test building create ok")
         response = self.client.get(reverse('bimblog:building_create'))
         self.assertEqual(response.status_code, 200)
+        print("--Test buildingplan create ok")
         response = self.client.get(reverse('bimblog:buildingplan_create',
             kwargs={'slug': 'building'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test station create ok")
         response = self.client.get(reverse('bimblog:station_create',
             kwargs={'slug': 'building'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test image create ok")
         response = self.client.get(reverse('bimblog:image_add',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 200)
 
     def test_update_status_code_forbidden(self):
+        print("\n-Test bimblog update forbidden")
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
+        print("--Test building update forbidden")
         response = self.client.get(reverse('bimblog:building_change',
             kwargs={'slug': 'building' }))
         self.assertEqual(response.status_code, 403)
+        print("--Test building plan update forbidden")
         response = self.client.get(reverse('bimblog:buildingplan_change',
             kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test station update forbidden")
         response = self.client.get(reverse('bimblog:station_change',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test image update forbidden")
         response = self.client.get(reverse('bimblog:image_change',
             kwargs={'build_slug': 'building', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 403)
 
     def test_update_status_code_ok(self):
+        print("\n-Test bimblog update ok")
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
+        print("--Test building update ok")
         response = self.client.get(reverse('bimblog:building_change',
             kwargs={'slug': 'building' }))
         self.assertEqual(response.status_code, 200)
+        print("--Test building plan update ok")
         response = self.client.get(reverse('bimblog:buildingplan_change',
             kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test station update ok")
         response = self.client.get(reverse('bimblog:station_change',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test image update ok")
         response = self.client.get(reverse('bimblog:image_change',
             kwargs={'build_slug': 'building', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 200)
 
     def test_delete_status_code_forbidden(self):
+        print("\n-Test bimblog delete forbidden")
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
+        print("--Test building delete forbidden")
         response = self.client.get(reverse('bimblog:building_delete',
             kwargs={'slug': 'building' }))
         self.assertEqual(response.status_code, 403)
+        print("--Test building plan delete forbidden")
         response = self.client.get(reverse('bimblog:buildingplan_delete',
             kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test station delete forbidden")
         response = self.client.get(reverse('bimblog:station_delete',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test image delete forbidden")
         response = self.client.get(reverse('bimblog:image_delete',
             kwargs={'build_slug': 'building', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 403)
 
     def test_delete_status_code_ok(self):
+        print("\n-Test bimblog delete ok")
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
+        print("--Test building delete ok")
         response = self.client.get(reverse('bimblog:image_delete',
             kwargs={'build_slug': 'building', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 200)
+        print("--Test building plan delete ok")
         response = self.client.get(reverse('bimblog:station_delete',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test station delete ok")
         response = self.client.get(reverse('bimblog:buildingplan_delete',
             kwargs={'build_slug': 'building', 'plan_slug': 'plan-1-0'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test image delete ok")
         response = self.client.get(reverse('bimblog:building_delete',
             kwargs={'slug': 'building' }))
         self.assertEqual(response.status_code, 200)
 
 
     def test_wrong_parent_status_code(self):
+        print("\n-Test bimblog wrong parent")
         self.client.post(reverse('front_login'), {'username':'adder',
             'password':'P4s5W0r6'})
         stat = PhotoStation.objects.get(slug='station')
         image = StationImage.objects.get(stat_id=stat.id)
+        print("--Test station detail wrong parent")
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 404)
+        print("--Test image create wrong parent")
         response = self.client.get(reverse('bimblog:image_add',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 404)
+        print("--Test building plan wrong parent")
         response = self.client.get(reverse('bimblog:buildingplan_change',
             kwargs={'build_slug': 'building-2', 'plan_slug': 'plan-1-0'}))
         self.assertEqual(response.status_code, 404)
+        print("--Test station change wrong parent")
         response = self.client.get(reverse('bimblog:station_change',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 404)
+        print("--Test image change wrong parent")
         response = self.client.get(reverse('bimblog:image_change',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 404)
+        print("--Test plan delete wrong parent")
         response = self.client.get(reverse('bimblog:buildingplan_delete',
             kwargs={'build_slug': 'building-2', 'plan_slug': 'plan-1-0'}))
         self.assertEqual(response.status_code, 404)
+        print("--Test station delete wrong parent")
         response = self.client.get(reverse('bimblog:station_delete',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 404)
+        print("--Test image delete wrong parent")
         response = self.client.get(reverse('bimblog:image_delete',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station',
             'pk': image.id}))
         self.assertEqual(response.status_code, 404)
+        print("--Test image change wrong parent")
         response = self.client.get(reverse('bimblog:image_change',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station-2',
             'pk': image.id}))
         self.assertEqual(response.status_code, 404)
+        print("--Test image delete wrong station")
         response = self.client.get(reverse('bimblog:image_delete',
             kwargs={'build_slug': 'building-2', 'stat_slug': 'station-2',
             'pk': image.id}))
