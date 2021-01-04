@@ -81,28 +81,37 @@ class BuildingViewsTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_list_and_detail_status_code_ok(self):
+        print("\n-Test bimblog ok")
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
+        print("--Test building list ok")
         response = self.client.get(reverse('bimblog:building_list'))
         self.assertEqual(response.status_code, 200)
+        print("--Test building detail ok")
         response = self.client.get(reverse('bimblog:building_detail',
             kwargs={'slug': 'building'}))
         self.assertEqual(response.status_code, 200)
+        print("--Test station detail ok")
         response = self.client.get(reverse('bimblog:station_detail',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 200)
 
     def test_create_status_code_forbidden(self):
+        print("\n-Test bimblog create forbidden")
         self.client.post(reverse('front_login'), {'username':'viewer',
             'password':'P4s5W0r6'})
+        print("--Test building create forbidden")
         response = self.client.get(reverse('bimblog:building_create'))
         self.assertEqual(response.status_code, 403)
+        print("--Test buildingplan create forbidden")
         response = self.client.get(reverse('bimblog:buildingplan_create',
             kwargs={'slug': 'building'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test photo station create forbidden")
         response = self.client.get(reverse('bimblog:station_create',
             kwargs={'slug': 'building'}))
         self.assertEqual(response.status_code, 403)
+        print("--Test image create forbidden")
         response = self.client.get(reverse('bimblog:image_add',
             kwargs={'build_slug': 'building', 'stat_slug': 'station'}))
         self.assertEqual(response.status_code, 403)
