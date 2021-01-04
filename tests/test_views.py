@@ -375,3 +375,71 @@ class BuildingViewsTest(TestCase):
                 kwargs={'slug': 'building'})+'?plan_deleted=Created plan',
             status_code=302,
             target_status_code = 200)
+
+    def test_photostation_crud_redirect(self):
+        print("\n-Test PhotoStation CrUD correct redirection")
+        self.client.post(reverse('front_login'), {'username':'adder',
+            'password':'P4s5W0r6'})
+        build = Building.objects.get(slug='building')
+        plan = BuildingPlan.objects.get(slug='plan-1-0')
+        print("--Create photo station")
+        response = self.client.post(reverse('bimblog:station_create',
+            kwargs={'slug': 'building'}),
+            {'build': build.id, 'plan': plan.id , 'title': 'Created station',
+            'intro': 'Foo', 'lat': 40, 'long': 20 },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building'})+'?stat_created=Created station',
+            status_code=302,
+            target_status_code = 200)#302 is first step of redirect chain
+        print("--Create photo station and add another")
+        response = self.client.post(reverse('bimblog:station_create',
+            kwargs={'slug': 'building'}),
+            {'build': build.id, 'plan': plan.id , 'title': 'Created station add',
+            'intro': 'Foo', 'lat': 40, 'long': 20, 'add_another': '' },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:station_create',
+                kwargs={'slug': 'building'})+'?stat_created=Created station add',
+            status_code=302,
+            target_status_code = 200)
+        print("--Modify photo station")
+        response = self.client.post(reverse('bimblog:station_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'created-station'}),
+            {'build': build.id, 'plan': plan.id , 'title': 'Created station',
+            'intro': 'Bar', 'lat': 40, 'long': 20 },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:station_detail',
+                kwargs={'build_slug': 'building',
+                'stat_slug': 'created-station'})+'?stat_modified=Created station',
+            status_code=302,
+            target_status_code = 200)
+        print("--Modify photo station and add another")
+        response = self.client.post(reverse('bimblog:station_change',
+            kwargs={'build_slug': 'building', 'stat_slug': 'created-station-add'}),
+            {'build': build.id, 'plan': plan.id , 'title': 'Created station add',
+            'intro': 'Bar', 'lat': 40, 'long': 20, 'add_another': '' },
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:station_create',
+                kwargs={'slug': 'building'})+'?stat_modified=Created station add',
+            status_code=302,
+            target_status_code = 200)
+        print("--Delete photo station")
+        response = self.client.post(reverse('bimblog:station_delete',
+            kwargs={'build_slug': 'building', 'stat_slug': 'created-station'}),
+            {'delete': True},
+            follow = True)
+        self.assertRedirects(response,
+            reverse('bimblog:building_detail',
+                kwargs={'slug': 'building'})+'?stat_deleted=Created station',
+            status_code=302,
+            target_status_code = 200)
+
+        def test_stationimage_crud_redirect(self):
+            print("\n-Test StationImage CrUD correct redirection")
+            self.client.post(reverse('front_login'), {'username':'adder',
+                'password':'P4s5W0r6'})
+            stat = PhotoStation.objects.get(slug='station')
