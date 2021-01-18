@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
 {% load i18n %}
 
 {% block title %}{{ website.acro }} | {% translate 'Delete image' %}{%endblock title %}
@@ -10,21 +9,7 @@
   <div class="col-md-8">
     <h4><strong>{% translate 'Delete image:' %} {{ title }}</strong></h4>
     {% if perms.bimblog.delete_stationimage %}
-    <p>{% translate "WARNING, we can't undo this!" %}</p>
-    <hr class="mb-4">
-    <form action="" method="post" novalidate>
-      <div class="row">
-        <div class="col col-md-6">
-          <button class="btn btn-danger btn-lg btn-block" type="submit">{% translate "Delete" %}</button>
-        </div>
-        <div class="col col-md-6">
-          <button class="btn btn-light btn-lg btn-block" type="submit" name="cancel">
-            {% translate "Cancel" %}</button>
-        </div>
-      </div>
-      {% csrf_token %}
-    </form>
-    <hr class="mb-4">
+    {% include 'bimblog/includes/delete_buttons.html' %}
     {% else %}
     <p>{% translate "You don't have permissions to delete images" %}.</p>
     {% endif %}
