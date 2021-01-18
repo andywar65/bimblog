@@ -10,24 +10,21 @@
   <div class="col-md-8">
     <h4><strong>{% translate 'Delete image:' %} {{ title }}</strong></h4>
     {% if perms.bimblog.delete_stationimage %}
+    <p>{% translate "WARNING, we can't undo this!" %}</p>
     <hr class="mb-4">
-    {% if form.errors %}
-      <p class="alert alert-danger" role="alert">
-        {% translate 'Fix the errors below, please' %}.
-      </p>
-    {% endif %}
     <form action="" method="post" novalidate>
       <div class="row">
-        <div class="col-md-6 mb-3">
-            {{ form.delete|as_crispy_field }}
+        <div class="col col-md-6">
+          <button class="btn btn-danger btn-lg btn-block" type="submit">{% translate "Delete" %}</button>
+        </div>
+        <div class="col col-md-6">
+          <button class="btn btn-light btn-lg btn-block" type="submit" name="cancel">
+            {% translate "Cancel" %}</button>
         </div>
       </div>
-      <hr class="mb-4">
-        <button class="btn btn-secondary btn-lg btn-block" type="submit">{% translate 'Delete' %}</button>
-        <small>{% translate 'Fields with asterisk (*) are required' %}</small>
-      <hr class="mb-4">
       {% csrf_token %}
     </form>
+    <hr class="mb-4">
     {% else %}
     <p>{% translate "You don't have permissions to delete images" %}.</p>
     {% endif %}
