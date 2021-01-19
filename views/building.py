@@ -63,6 +63,40 @@ class BuildingCreateView( PermissionRequiredMixin, CreateView ):
                 kwargs={'slug': self.object.slug }) +
                 f'?created={self.object.title}')
 
+class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
+    model = Building
+    permission_required = 'bimblog.view_building'
+    form_class = BuildingCreateForm
+    template_name = 'bimblog/building_list_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #list all buildings
+        context['builds'] = Building.objects.all()
+        #building alerts
+        if 'created' in self.request.GET:
+            context['created'] = self.request.GET['created']
+        elif 'modified' in self.request.GET:
+            context['modified'] = self.request.GET['modified']
+        elif 'deleted' in self.request.GET:
+            context['deleted'] = self.request.GET['deleted']
+        #we add the following to feed the map
+        context['city_lat'] = settings.CITY_LAT
+        context['city_long'] = settings.CITY_LONG
+        context['city_zoom'] = settings.CITY_ZOOM
+        context['mapbox_token'] = settings.MAPBOX_TOKEN
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:building_list') +
+                '#building-create' +
+                f'?created={self.object.title}')
+        else:
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.object.slug }) +
+                f'?created={self.object.title}')
+
 class BuildingDetailView(PermissionRequiredMixin, DetailView):
     model = Building
     permission_required = 'bimblog.view_building'

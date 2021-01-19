@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load fb_versions %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{{ website.acro }} | {% translate "Buildings" %}{% endblock title %}
+
+{% block extra-head %}
+  {% include 'bimblog/leaflet_extra_head.html' %}
+{% endblock extra-head %}
+
+{% block content %}
+{% include "bimblog/building_alerts.html" %}
+<div class="row">
+  <div class="col col-md-8">
+    <h4><strong>{% translate "List of buildings" %}</strong></h4>
+  </div>
+  <div class="col col-md-4 text-right">
+    {% if perms.bimblog.add_building %}
+      <a class="btn btn-secondary" href="#building-create" title="{% translate "Add building" %}">
+        + <i class="fa fa-building"></i></a>
+    {% endif %}
+  </div>
+</div>
+<hr class="mb-4">
+<div class="row">
+  <div class="col" id="mapid" style="height: 600px;"></div>
+</div>
+<div class="row" id="building-create">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <h4><strong>{% translate "Add building" %}</strong></h4>
+    {% if perms.bimblog.add_building %}
+    <p>{% blocktranslate with name=user.get_short_name %}
+      Hello {{ name }}, fill the fields below then submit.
+    {% endblocktranslate %}</p>
+    <hr class="mb-4">
+    {% if form.errors %}
+      <p class="alert alert-danger" role="alert">
+        {% translate 'Fix the errors below, please' %}.
+      </p>
+    {% endif %}
+    <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
+        {{ form|crispy }}
+        <hr class="mb-4">
+          {% include "bimblog/add_buttons.html" %}
+        <hr class="mb-4">
+      {% csrf_token %}
+    </form>
+    {% else %}
+    {% translate "You don't have permissions to add buildings" %}.
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+{% block extra-js %}
+<script type="text/javascript">
+  var mymap = L.map('mapid').setView([{{ city_lat|unlocalize }}, {{ city_long|unlocalize }}], {{ city_zoom|unlocalize }});
+
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 19,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: '{{ mapbox_token }}'
+  }).addTo(mymap);
+
+  {% if builds %}
+    const buildMarker = L.divIcon({
+      html: '<i class="fa fa-building fa-2x" style="color: blue;"></i>',
+      iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
+      className: 'build-marker'
+    });
+    {% for build in builds %}
+      var content = "<h5><a href=\"{% url 'bimblog:building_detail' slug=build.slug %}\">{{ build.title }}</a></h5><img src=\"{% version build.fb_image 'medium' %}\"><br><small>{{ build.intro }}</small>"
+      L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}], {icon: buildMarker}).addTo(mymap)
+        .bindPopup(content, {minWidth: 300});
+    {% endfor %}
+  {% endif %}
+  function onMapClick(e) {
+    var inputlat = document.getElementById("id_lat");
+    var inputlong = document.getElementById("id_long");
+    var inputzoom = document.getElementById("id_zoom");
+    inputlat.setAttribute('value', e.latlng.lat);
+    inputlong.setAttribute('value', e.latlng.lng);
+    inputzoom.setAttribute('value', mymap.getZoom());
+  }
+
+  mymap.on('click', onMapClick);
+</script>
+{% endblock extra-js %}
