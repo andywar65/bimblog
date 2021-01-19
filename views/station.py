@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( PhotoStationCreateForm,
-    PhotoStationDeleteForm, StationImageCreateForm, StationImageUpdateForm,
+    BuildingDeleteForm, StationImageCreateForm, StationImageUpdateForm,
     StationImageDeleteForm )
 
 class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
@@ -127,7 +127,7 @@ class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
 class PhotoStationDeleteView(PermissionRequiredMixin, FormView):
     #model = PhotoStation
     permission_required = 'bimblog.delete_photostation'
-    form_class = PhotoStationDeleteForm
+    form_class = BuildingDeleteForm
     template_name = 'bimblog/photostation_form_delete.html'
 
     def setup(self, request, *args, **kwargs):
@@ -227,7 +227,7 @@ class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
 
 class StationImageDeleteView(PermissionRequiredMixin, FormView):
     permission_required = 'bimblog.delete_stationimage'
-    form_class = StationImageDeleteForm
+    form_class = BuildingDeleteForm
     template_name = 'bimblog/stationimage_form_delete.html'
 
     def setup(self, request, *args, **kwargs):

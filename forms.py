@@ -20,7 +20,8 @@ class BuildingUpdateForm(ModelForm):
             'zoom')
 
 class BuildingDeleteForm(forms.Form):
-    delete = forms.BooleanField( label=_("Delete the building"), required = True,
+    delete = forms.BooleanField( label=_("Delete the building"),
+        required = False,
         help_text = _("""Caution, can't undo this."""))
 
 class BuildingPlanCreateForm(ModelForm):
@@ -33,7 +34,7 @@ class BuildingPlanCreateForm(ModelForm):
 
 class BuildingPlanDeleteForm(forms.Form):
     delete = forms.BooleanField( label=_("Delete the building plan"),
-        required = True,
+        required = False,
         help_text = _("""Caution, can't undo this."""))
 
 class PhotoStationCreateForm(ModelForm):

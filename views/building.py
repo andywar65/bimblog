@@ -141,10 +141,14 @@ class BuildingDeleteView(PermissionRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        self.build.delete()
+        if not 'cancel' in self.request.POST:
+            self.build.delete()
         return super(BuildingDeleteView, self).form_valid(form)
 
     def get_success_url(self):
+        if 'cancel' in self.request.POST:
+            return reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug })
         return reverse('bimblog:building_list') + f'?deleted={self.build.title}'
 
 class BuildingPlanCreateView( PermissionRequiredMixin, CreateView ):
@@ -209,7 +213,7 @@ class BuildingPlanUpdateView( PermissionRequiredMixin, UpdateView ):
 class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
     #model = BuildingPlan
     permission_required = 'bimblog.delete_buildingplan'
-    form_class = BuildingPlanDeleteForm
+    form_class = BuildingDeleteForm
     template_name = 'bimblog/buildingplan_form_delete.html'
 
     def setup(self, request, *args, **kwargs):
@@ -227,10 +231,14 @@ class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        self.plan.delete()
+        if not 'cancel' in self.request.POST:
+            self.plan.delete()
         return super(BuildingPlanDeleteView, self).form_valid(form)
 
     def get_success_url(self):
+        if 'cancel' in self.request.POST:
+            return reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug})
         return (reverse('bimblog:building_detail',
             kwargs={'slug': self.build.slug}) +
             f'?plan_deleted={self.plan.title}')
