@@ -10,8 +10,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
-from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm, BuildingDeleteForm,
-    BuildingPlanCreateForm, BuildingPlanDeleteForm, )
+from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
+    BuildingDeleteForm, BuildingPlanCreateForm, )
 
 class BuildingListView(PermissionRequiredMixin, ListView):
     model = Building

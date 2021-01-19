@@ -11,8 +11,7 @@ from django.utils.translation import gettext as _
 
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( PhotoStationCreateForm,
-    BuildingDeleteForm, StationImageCreateForm, StationImageUpdateForm,
-    StationImageDeleteForm )
+    BuildingDeleteForm, StationImageCreateForm, StationImageUpdateForm, )
 
 class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
     model = PhotoStation

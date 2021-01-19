@@ -32,11 +32,6 @@ class BuildingPlanCreateForm(ModelForm):
         model = BuildingPlan
         fields = '__all__'
 
-class BuildingPlanDeleteForm(forms.Form):
-    delete = forms.BooleanField( label=_("Delete the building plan"),
-        required = False,
-        help_text = _("""Caution, can't undo this."""))
-
 class PhotoStationCreateForm(ModelForm):
     build = forms.ModelChoiceField( label=_('Building'),
         queryset=Building.objects.all(), disabled = True )
@@ -49,11 +44,6 @@ class PhotoStationCreateForm(ModelForm):
         super(PhotoStationCreateForm, self).__init__(**kwargs)
         #filter plan queryset
         self.fields['plan'].queryset = BuildingPlan.objects.filter(build_id=self.initial['build'])
-
-class PhotoStationDeleteForm(forms.Form):
-    delete = forms.BooleanField( label=_("Delete photo station"),
-        required = False,
-        help_text = _("""Caution, can't undo this."""))
 
 class StationImageCreateForm(ModelForm):
     stat = forms.ModelChoiceField( label=_('Photo station'),
@@ -71,8 +61,3 @@ class StationImageUpdateForm(ModelForm):
     class Meta:
         model = StationImage
         fields = ( 'image', 'stat', 'date', 'caption')
-
-class StationImageDeleteForm(forms.Form):
-    delete = forms.BooleanField( label=_("Delete image"),
-        required = False,
-        help_text = _("""Caution, can't undo this."""))
