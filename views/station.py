@@ -145,10 +145,15 @@ class PhotoStationDeleteView(PermissionRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        self.stat.delete()
+        if not 'cancel' in self.request.POST:
+            self.stat.delete()
         return super(PhotoStationDeleteView, self).form_valid(form)
 
     def get_success_url(self):
+        if 'cancel' in self.request.POST:
+            return reverse( 'bimblog:station_detail',
+                kwargs={'build_slug': self.build.slug,
+                'stat_slug': self.stat.slug})
         return (reverse('bimblog:building_detail',
             kwargs={'slug': self.build.slug}) +
             f'?stat_deleted={self.stat.title}')
@@ -250,9 +255,9 @@ class StationImageDeleteView(PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         if 'cancel' in self.request.POST:
-            return (reverse('bimblog:station_detail',
+            return reverse('bimblog:station_detail',
                 kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug}))
+                'stat_slug': self.stat.slug})
         return (reverse('bimblog:station_detail',
             kwargs={'build_slug': self.build.slug, 'stat_slug': self.stat.slug}) +
             f'?img_deleted={self.title}')

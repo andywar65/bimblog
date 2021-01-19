@@ -51,7 +51,7 @@ class PhotoStationCreateForm(ModelForm):
 
 class PhotoStationDeleteForm(forms.Form):
     delete = forms.BooleanField( label=_("Delete photo station"),
-        required = True,
+        required = False,
         help_text = _("""Caution, can't undo this."""))
 
 class StationImageCreateForm(ModelForm):
