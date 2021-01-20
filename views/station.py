@@ -53,42 +53,6 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
                 kwargs={'slug': self.build.slug}) +
                 f'?stat_created={self.object.title}')
 
-class PhotoStationDetailView( PermissionRequiredMixin, DetailView):
-    model = PhotoStation
-    permission_required = 'bimblog.view_photostation'
-    context_object_name = 'stat'
-    slug_field = 'slug'
-    slug_url_kwarg = 'stat_slug'
-
-    def get_object(self, queryset=None):
-        obj = super(PhotoStationDetailView, self).get_object(queryset=None)
-        build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
-        if not build == obj.build:
-            raise Http404(_("Station does not belong to Building"))
-        return obj
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'stat_created' in self.request.GET:
-            context['stat_created'] = self.request.GET['stat_created']
-        elif 'stat_modified' in self.request.GET:
-            context['stat_modified'] = self.request.GET['stat_modified']
-        elif 'img_created' in self.request.GET:
-            context['img_created'] = self.request.GET['img_created']
-        elif 'img_modified' in self.request.GET:
-            context['img_modified'] = self.request.GET['img_modified']
-        elif 'img_deleted' in self.request.GET:
-            context['img_deleted'] = self.request.GET['img_deleted']
-        #we add the following to feed the gallery
-        context['main_gal_slug'] = get_random_string(7)
-        #gallery images
-        if 'reverse' in self.request.GET:
-            context['reverse'] = self.request.GET['reverse']
-            context['images'] = self.object.station_image.all().reverse()
-        else:
-            context['images'] = self.object.station_image.all()
-        return context
-
 class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
     model = PhotoStation
     permission_required = 'bimblog.change_photostation'
@@ -204,44 +168,6 @@ class StationImageListCreateView( PermissionRequiredMixin, CreateView ):
             kwargs={'build_slug': self.build.slug,
             'stat_slug': self.stat.slug}) +
             f'?img_created={self.object.id}')
-
-class StationImageCreateView( PermissionRequiredMixin, CreateView ):
-    model = StationImage
-    permission_required = 'bimblog.add_stationimage'
-    form_class = StationImageCreateForm
-
-    def setup(self, request, *args, **kwargs):
-        super(StationImageCreateView, self).setup(request, *args, **kwargs)
-        #here we get the project by the slug
-        self.build = get_object_or_404( Building, slug = self.kwargs['build_slug'] )
-        self.stat = get_object_or_404( PhotoStation, slug = self.kwargs['stat_slug'] )
-        if not self.stat.build == self.build:
-            raise Http404(_("Station does not belong to Building"))
-
-    def get_initial(self):
-        initial = super( StationImageCreateView, self ).get_initial()
-        initial['stat'] = self.stat.id
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'img_created' in self.request.GET:
-            context['img_created'] = self.request.GET['img_created']
-        elif 'img_modified' in self.request.GET:
-            context['img_modified'] = self.request.GET['img_modified']
-        return context
-
-    def get_success_url(self):
-        if 'add_another' in self.request.POST:
-            return (reverse('bimblog:image_add',
-                kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug}) +
-                f'?img_created={self.object.id}')
-        else:
-            return (reverse('bimblog:station_detail',
-                kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug}) +
-                f'?img_created={self.object.id}')
 
 class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
     model = StationImage

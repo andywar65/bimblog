@@ -1,18 +1,17 @@
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
-from .views import (BuildingListView, BuildingDetailView, BuildingCreateView,
+from .views import (BuildingDetailView,
     BuildingUpdateView, BuildingDeleteView, BuildingPlanCreateView,
     BuildingPlanUpdateView, BuildingPlanDeleteView, PhotoStationCreateView,
-    PhotoStationDetailView, PhotoStationUpdateView, PhotoStationDeleteView,
-    StationImageCreateView, StationImageUpdateView, StationImageDeleteView,
+    PhotoStationUpdateView, PhotoStationDeleteView,
+    StationImageUpdateView, StationImageDeleteView,
     StationImageDayArchiveView, BuildingListCreateView,
     StationImageListCreateView)
 
 app_name = 'bimblog'
 urlpatterns = [
     path('', BuildingListCreateView.as_view(), name = 'building_list'),
-    path(_('add/'), BuildingCreateView.as_view(), name = 'building_create'),
     path('<slug>/', BuildingDetailView.as_view(), name = 'building_detail'),
     path(_('<slug>/change/'), BuildingUpdateView.as_view(), name = 'building_change'),
     path(_('<slug>/delete/'), BuildingDeleteView.as_view(), name = 'building_delete'),
@@ -30,8 +29,6 @@ urlpatterns = [
         PhotoStationUpdateView.as_view(), name = 'station_change'),
     path(_('<slug:build_slug>/station/<slug:stat_slug>/delete/'),
         PhotoStationDeleteView.as_view(), name = 'station_delete'),
-    path(_('<slug:build_slug>/stations/<slug:stat_slug>/image/add/'),
-        StationImageCreateView.as_view(), name = 'image_add'),
     path(_('<slug:build_slug>/stations/<slug:stat_slug>/image/<pk>/change'),
         StationImageUpdateView.as_view(), name = 'image_change'),
     path(_('<slug:build_slug>/stations/<slug:stat_slug>/image/<pk>/delete'),
