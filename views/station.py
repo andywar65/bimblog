@@ -261,16 +261,10 @@ class StationImageUpdateView( PermissionRequiredMixin, UpdateView ):
         return img
 
     def get_success_url(self):
-        if 'add_another' in self.request.POST:
-            return (reverse('bimblog:image_add',
-                kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug}) +
-                f'?img_modified={self.object.id}')
-        else:
-            return (reverse('bimblog:station_detail',
-                kwargs={'build_slug': self.build.slug,
-                'stat_slug': self.stat.slug}) +
-                f'?img_modified={self.object.id}')
+        return (reverse('bimblog:station_detail',
+            kwargs={'build_slug': self.build.slug,
+            'stat_slug': self.stat.slug}) +
+            f'?img_modified={self.object.id}')
 
 class StationImageDeleteView(PermissionRequiredMixin, FormView):
     permission_required = 'bimblog.delete_stationimage'

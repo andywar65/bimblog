@@ -34,13 +34,14 @@
 {% endif %}
 <hr class="mb-4">
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-2"></div>
+  <div class="col-md-4">
     {% if perms.bimblog.change_photostation %}
       <a class="btn btn-primary" href="{% url 'bimblog:station_change' build_slug=stat.build.slug stat_slug=stat.slug%}" title="{% translate "Modify photo station" %}">
         <i class="fa fa-pencil"></i> <i class="fa fa-camera"></i></a>
     {% endif %}
   </div>
-  <div class="col-md-6 text-right">
+  <div class="col-md-4 text-right">
     <a class="btn btn-secondary" href="{% url 'bimblog:building_detail' slug=stat.build.slug %}" title="{% translate "Back to building" %}">
       <i class="fa fa-angle-double-left"></i> <i class="fa fa-building"></i></a>
   </div>
