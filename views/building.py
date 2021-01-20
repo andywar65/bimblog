@@ -90,7 +90,6 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
     def get_success_url(self):
         if 'add_another' in self.request.POST:
             return (reverse('bimblog:building_list') +
-                '#building-create' +
                 f'?created={self.object.title}')
         else:
             return (reverse('bimblog:building_detail',
@@ -152,7 +151,7 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
-            return (reverse('bimblog:building_create') +
+            return (reverse('bimblog:building_list') +
                 f'?modified={self.object.title}')
         else:
             return (reverse('bimblog:building_detail',
