@@ -11,19 +11,13 @@
     {% include "bimblog/buildingplan_alerts.html" %}
     <h4><strong>{% translate "Add building plan" %}</strong></h4>
     {% if perms.bimblog.add_buildingplan %}
-    <p>{% blocktranslate with name=user.get_short_name %}
-      Hello {{ name }}, fill the fields below then submit.
-    {% endblocktranslate %}</p>
+    {% include "bimblog/includes/hello_formula.html" %}
     <hr class="mb-4">
-    {% if form.errors %}
-      <p class="alert alert-danger" role="alert">
-        {% translate 'Fix the errors below, please' %}.
-      </p>
-    {% endif %}
+    {% include "bimblog/includes/form_errors.html" %}
     <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
         {{ form|crispy }}
         <hr class="mb-4">
-          {% include "bimblog/add_buttons.html" %}
+          {% include "bimblog/includes/add_buttons.html" %}
         <hr class="mb-4">
       {% csrf_token %}
     </form>

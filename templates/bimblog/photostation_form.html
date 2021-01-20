@@ -14,19 +14,13 @@
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
-    {% include "bimblog/photostation_alerts.html" %}
-    {% include "bimblog/stationimage_alerts.html" %}
+    {% include "bimblog/includes/photostation_alerts.html" %}
+    {% include "bimblog/includes/stationimage_alerts.html" %}
     <h4><strong>{% translate "Add photo station" %}</strong></h4>
     {% if perms.bimblog.add_photostation %}
-    <p>{% blocktranslate with name=user.get_short_name %}
-      Hello {{ name }}, fill the fields below then submit.
-    {% endblocktranslate %}</p>
+    {% include "bimblog/includes/hello_formula.html" %}
     <hr class="mb-4">
-    {% if form.errors %}
-      <p class="alert alert-danger" role="alert">
-        {% translate 'Fix the errors below, please' %}.
-      </p>
-    {% endif %}
+    {% include "bimblog/includes/form_errors.html" %}
     <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
         {{ form|crispy }}
         <hr class="mb-4">
@@ -34,7 +28,7 @@
           <div class="col" id="mapid" style="height: 480px;"></div>
         </div>
         <hr class="mb-4">
-          {% include "bimblog/add_buttons.html" %}
+          {% include "bimblog/includes/add_buttons.html" %}
         <hr class="mb-4">
       {% csrf_token %}
     </form>
