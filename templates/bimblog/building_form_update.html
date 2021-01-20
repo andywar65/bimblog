@@ -7,37 +7,26 @@
 {% block title %}{{ website.acro }} | {% translate "Modify building" %}{% endblock title %}
 
 {% block extra-head %}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-     crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-    crossorigin=""></script>
+  {% include 'bimblog/includes/leaflet_extra_head.html' %}
 {% endblock extra-head %}
 
 {% block content %}
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
-    {% include "bimblog/building_alerts.html" %}
+    {% include "bimblog/includes/building_alerts.html" %}
     <h4><strong>{% translate "Modify building" %}</strong></h4>
     {% if perms.bimblog.change_building %}
     <div class="row">
       <div class="col col-md-8">
-        {% blocktranslate with name=user.get_short_name %}
-          Hello {{ name }}, update the fields below then submit.
-        {% endblocktranslate %}
+        {% include "bimblog/includes/hello_formula.html" %}
       </div>
       <div class="col col-md-4 text-right">
         <a class="btn btn-danger" href="{% url 'bimblog:building_delete' object.slug %}">{% translate 'Delete' %}</a>
       </div>
     </div>
     <hr class="mb-4">
-    {% if form.errors %}
-      <p class="alert alert-danger" role="alert">
-        {% translate 'Fix the errors below, please' %}.
-      </p>
-    {% endif %}
+    {% include "bimblog/includes/form_errors.html" %}
     <div class="row"><div class="col">
       <a href="{{ object.fb_image.url }}">
         <img src="{% version object.fb_image 'small' %}"
@@ -51,7 +40,7 @@
           <div class="col" id="mapid" style="height: 480px;"></div>
         </div>
         <hr class="mb-4">
-          {% include "bimblog/add_buttons.html" %}
+          {% include "bimblog/includes/add_buttons.html" %}
         <hr class="mb-4">
       {% csrf_token %}
     </form>
