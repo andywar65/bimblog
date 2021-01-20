@@ -11,7 +11,7 @@
 {% endblock extra-head %}
 
 {% block content %}
-{% include "bimblog/building_alerts.html" %}
+{% include "bimblog/includes/building_alerts.html" %}
 <div class="row">
   <div class="col col-md-8">
     <h4><strong>{% translate "List of buildings" %}</strong></h4>
@@ -33,20 +33,14 @@
     <hr class="mb-4">
     <h4><strong>{% translate "Add building" %}</strong></h4>
     {% if perms.bimblog.add_building %}
-    <p>{% blocktranslate with name=user.get_short_name %}
-      Hello {{ name }}, fill the fields below then submit.
-    {% endblocktranslate %}</p>
+    {% include "bimblog/includes/hello_formula.html" %}
     <p>{% translate "Click on the map above to set Latitude, Longitude and Zoom factor." %}</p>
     <hr class="mb-4">
-    {% if form.errors %}
-      <p class="alert alert-danger" role="alert">
-        {% translate 'Fix the errors below, please' %}.
-      </p>
-    {% endif %}
+    {% include "bimblog/includes/form_errors.html" %}
     <form action="" method="post" class="needs-validation"  enctype="multipart/form-data" novalidate>
         {{ form|crispy }}
         <hr class="mb-4">
-          {% include "bimblog/add_buttons.html" %}
+          {% include "bimblog/includes/add_buttons.html" %}
         <hr class="mb-4">
       {% csrf_token %}
     </form>
