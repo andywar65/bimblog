@@ -163,6 +163,11 @@ class StationImageListCreateView( PermissionRequiredMixin, CreateView ):
             context['images'] = self.stat.station_image.all()
         return context
 
+    def form_valid(self, form):
+        if not self.request.user.has_perm('bimblog.add_stationimage'):
+            raise Http404(_("User has no permission to add images"))
+        return super(StationImageListCreateView, self).form_valid(form)
+
     def get_success_url(self):
         return (reverse('bimblog:station_detail',
             kwargs={'build_slug': self.build.slug,

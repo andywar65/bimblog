@@ -49,6 +49,11 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
             'mapbox_token': settings.MAPBOX_TOKEN})
         return context
 
+    def form_valid(self, form):
+        if not self.request.user.has_perm('bimblog.add_building'):
+            raise Http404(_("User has no permission to add buildings"))
+        return super(BuildingListCreateView, self).form_valid(form)
+
     def get_success_url(self):
         if 'add_another' in self.request.POST:
             return (reverse('bimblog:building_list') +
