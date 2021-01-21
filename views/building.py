@@ -11,6 +11,8 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from filebrowser.settings import DIRECTORY
+
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
     BuildingDeleteForm, BuildingPlanCreateForm, )
@@ -36,11 +38,12 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
         #not using values() because we have to manipulate entries
         builds = []
         for build in context['builds']:
-            #path = reverse('bimblog:building_detail',
-                #kwargs={'slug': build.slug})
+            build.fb_image.version_generate("medium")
+            fb_path = (settings.MEDIA_URL + DIRECTORY +
+                build.fb_image.version_path("medium"))
             builds.append({'title': build.title, 'intro': build.intro,
                 'path': build.get_full_path(), 'lat': build.lat,
-                'long': build.long})
+                'long': build.long, 'fb_path': fb_path})
         context['map_data'] = json.dumps({'builds': builds,
             'city_lat': settings.CITY_LAT,
             'city_long': settings.CITY_LONG,
