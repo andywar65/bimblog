@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView,
@@ -35,6 +37,10 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
         context['city_long'] = settings.CITY_LONG
         context['city_zoom'] = settings.CITY_ZOOM
         context['mapbox_token'] = settings.MAPBOX_TOKEN
+        context['map_data'] = json.dumps({'city_lat': settings.CITY_LAT,
+            'city_long': settings.CITY_LONG,
+            'city_zoom': settings.CITY_ZOOM,
+            'mapbox_token': settings.MAPBOX_TOKEN,})
         return context
 
     def get_success_url(self):
