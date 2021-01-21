@@ -33,10 +33,17 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
         elif 'deleted' in self.request.GET:
             context['deleted'] = self.request.GET['deleted']
         #we add the following to feed the map
+        builds = []
+        for build in context['builds']:
+            path = reverse('bimblog:building_detail',
+                kwargs={'slug': build.slug})
+            builds.append({'title': build.title, 'intro': build.intro,
+                'path': path, 'lat': build.lat, 'long': build.long})
         context['map_data'] = json.dumps({'city_lat': settings.CITY_LAT,
             'city_long': settings.CITY_LONG,
             'city_zoom': settings.CITY_ZOOM,
-            'mapbox_token': settings.MAPBOX_TOKEN,})
+            'mapbox_token': settings.MAPBOX_TOKEN,
+            'builds': builds})
         return context
 
     def get_success_url(self):
