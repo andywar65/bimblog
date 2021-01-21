@@ -1,0 +1,72 @@
+{% load static %}
+{% load fb_versions %}
+{% load i18n %}
+{% load l10n %}
+
+<script type="text/javascript">
+
+  var base_map = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 23,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: '{{ mapbox_token }}'
+  });
+
+  {% if plans %}{% for plan in plans %}
+  {% for obj in plan.geometry %}
+  var plan_{{ plan.id }}_{{ forloop.counter }} = L.{{ obj.type }}({{ obj.coords}}, { color: '{{ obj.color}}', fillcolor: '{{ obj.color}}', fillOpacity: 0.5 {% if obj.type == 'circle' %}, radius: {{ obj.radius|unlocalize }}{% endif %} }).bindPopup("{{ obj.popup }}");
+  {% endfor %}
+  {% endfor %}{% endif %}
+
+  {% if stations %}
+  const statMarker = L.divIcon({
+    html: '<i class="fa fa-camera fa-2x" style="color: red;"></i>',
+    iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
+    className: 'stat-marker'
+  });
+  {% for stat in stations %}
+  var content = "<h5><a href=\"{% url 'bimblog:station_detail' build_slug=build.slug stat_slug=stat.slug %}\">{{ stat.title }}</a></h5>{% if stat.station_image.first %}<img src=\"{% version stat.station_image.first.fb_image 'medium' %}\">{% endif %}<br><small>{{ stat.intro }}</small>"
+  var stat_{{ stat.id }} =  L.marker([{{ stat.lat|unlocalize }}, {{ stat.long|unlocalize }}], {icon: statMarker})
+    .bindPopup( content, {minWidth: 300});
+  {% endfor %}{% endif %}
+
+  {% if plans %}{% for plan in plans %}
+  var plan_{{ plan.id }} = L.layerGroup([{% for obj in plan.geometry %}plan_{{ plan.id }}_{{ forloop.counter }},{% endfor %}{% for stat in stations %}{% if stat.plan.id == plan.id %}stat_{{ stat.id }},{% endif %}{% endfor %}]);
+  {% endfor %}{% endif %}
+
+  {% if no_plan %}
+  var no_plan = L.layerGroup([{% for stat in no_plan %}stat_{{ stat.id }},{% endfor %}]);
+  {% endif %}
+
+  var mymap = L.map('mapid', {
+    center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
+    zoom: {{ build.zoom|unlocalize }},
+    layers: [base_map,
+    {% if plans %}{% for plan in plans.reverse %}{% if plan.visible %}plan_{{ plan.id }},{% endif %}{% endfor %}{% endif %}
+    {% if no_plan %} no_plan{% endif %}]
+  });
+
+  const buildMarker = L.divIcon({
+    html: '<i class="fa fa-building fa-2x" style="color: blue;"></i>',
+    iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
+    className: 'build-marker'
+  });
+
+  var content = "<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">"
+  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}], {icon: buildMarker}).bindPopup(content, {minWidth: 300}).addTo(mymap);
+
+  var baseMaps = {
+    "Base": base_map
+  };
+
+  var overlayMaps = { {% if plans %}{% for plan in plans %}
+    "{{ plan.title }}": plan_{{ plan.id }},
+  {% endfor %}{% endif %}
+  {% if no_plan %}"{% translate 'No plan' %}": no_plan{% endif %}
+  };
+
+  L.control.layers(baseMaps, overlayMaps).addTo(mymap);
+
+</script>
