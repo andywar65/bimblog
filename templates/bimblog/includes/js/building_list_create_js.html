@@ -1,7 +1,3 @@
-{% load fb_versions %}
-{% load i18n %}
-{% load l10n %}
-
 <script type="text/javascript">
 
   const map_data = JSON.parse('{{ map_data | escapejs }}');
@@ -17,18 +13,21 @@
     accessToken: map_data.mapbox_token
   }).addTo(mymap);
 
-  {% if builds %}
+  if ( map_data.builds ){
     const buildMarker = L.divIcon({
       html: '<i class="fa fa-building fa-2x" style="color: blue;"></i>',
       iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
       className: 'build-marker'
     });
-    {% for build in builds %}
-      var content = "<h5><a href=\"{% url 'bimblog:building_detail' slug=build.slug %}\">{{ build.title }}</a></h5><img src=\"{% version build.fb_image 'medium' %}\"><br><small>{{ build.intro }}</small>"
-      L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}], {icon: buildMarker}).addTo(mymap)
+    for (build of map_data.builds ){
+      var content = "<h5><a href=\"" + build.path + "\">" + build.title +
+        "</a></h5><img src=\"" + build.fb_path + "\"><br><small>" +
+          build.intro + "</small>"
+      L.marker([ build.lat , build.long ], {icon: buildMarker}).addTo(mymap)
         .bindPopup(content, {minWidth: 300});
-    {% endfor %}
-  {% endif %}
+    }
+  }
+
   function onMapClick(e) {
     var inputlat = document.getElementById("id_lat");
     var inputlong = document.getElementById("id_long");

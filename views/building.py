@@ -11,8 +11,6 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from filebrowser.settings import DIRECTORY
-
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
     BuildingDeleteForm, BuildingPlanCreateForm, )
@@ -39,7 +37,7 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
         builds = []
         for build in context['builds']:
             build.fb_image.version_generate("medium")
-            fb_path = (settings.MEDIA_URL + DIRECTORY +
+            fb_path = (settings.MEDIA_URL +
                 build.fb_image.version_path("medium"))
             builds.append({'title': build.title, 'intro': build.intro,
                 'path': build.get_full_path(), 'lat': build.lat,
