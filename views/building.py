@@ -79,10 +79,6 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         context['stat_list']['all'] = context['stations'].values_list('id')
         #add dates for images by date
         context['dates'] = StationImage.objects.filter(stat_id__in=context['stat_list']['all']).dates('date', 'day')
-        #add station lists by plan
-        no_plan = context['stations'].filter(plan_id=None)
-        if no_plan:
-            context['no_plan'] = no_plan
         #add alerts
         if 'created' in self.request.GET:
             context['created'] = self.request.GET['created']
@@ -101,7 +97,23 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         elif 'stat_deleted' in self.request.GET:
             context['stat_deleted'] = self.request.GET['stat_deleted']
         #we add the following to feed the map
-        context['mapbox_token'] = settings.MAPBOX_TOKEN
+        #building data
+        context['build'].fb_image.version_generate("medium")
+        fb_path = (settings.MEDIA_URL +
+            context['build'].fb_image.version_path("medium"))
+        build = {'title': context['build'].title,
+            'intro': context['build'].intro,
+            'lat': context['build'].lat, 'long': context['build'].long,
+            'zoom': context['build'].zoom,
+            'fb_path': fb_path}
+        #add stations that don't belong to plans
+        no_plan = context['stations'].filter(plan_id=None)
+        if no_plan:
+            context['no_plan'] = no_plan
+        context['map_data'] = json.dumps({
+            'build': build,
+            'no_plan_trans': _("No plan"),
+            'mapbox_token': settings.MAPBOX_TOKEN})
         return context
 
 class BuildingUpdateView(PermissionRequiredMixin, UpdateView):

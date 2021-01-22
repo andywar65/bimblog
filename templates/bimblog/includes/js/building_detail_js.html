@@ -5,13 +5,15 @@
 
 <script type="text/javascript">
 
+  const map_data = JSON.parse('{{ map_data | escapejs }}');
+
   var base_map = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 23,
     id: 'mapbox/streets-v11',
     tileSize: 512,
     zoomOffset: -1,
-    accessToken: '{{ mapbox_token }}'
+    accessToken: map_data.mapbox_token
   });
 
   {% if plans %}{% for plan in plans %}
@@ -41,8 +43,8 @@
   {% endif %}
 
   var mymap = L.map('mapid', {
-    center: [{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}],
-    zoom: {{ build.zoom|unlocalize }},
+    center: [ map_data.build.lat , map_data.build.long ],
+    zoom: map_data.build.zoom ,
     layers: [base_map,
     {% if plans %}{% for plan in plans.reverse %}{% if plan.visible %}plan_{{ plan.id }},{% endif %}{% endfor %}{% endif %}
     {% if no_plan %} no_plan{% endif %}]
@@ -54,8 +56,8 @@
     className: 'build-marker'
   });
 
-  var content = "<h5>{{ build.title }}</h5><img src=\"{% version build.fb_image 'medium' %}\">"
-  L.marker([{{ build.lat|unlocalize }}, {{ build.long|unlocalize }}], {icon: buildMarker}).bindPopup(content, {minWidth: 300}).addTo(mymap);
+  var content = "<h5>" + map_data.build.title + "</h5><img src=\"" + map_data.build.fb_path + "\">"
+  L.marker([ map_data.build.lat , map_data.build.long ], {icon: buildMarker}).bindPopup(content, {minWidth: 300}).addTo(mymap);
 
   var baseMaps = {
     "Base": base_map
