@@ -106,12 +106,30 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
             'lat': context['build'].lat, 'long': context['build'].long,
             'zoom': context['build'].zoom,
             'fb_path': fb_path}
+        #plan data
+        plans = []
+        for plan in context['plans']:
+            plans.append({'id': plan.id, 'geometry': plan.geometry})
+        #station data
+        stations = []
+        for stat in context['stations']:
+            stat.station_image.first().fb_image.version_generate("medium")
+            fb_path = (settings.MEDIA_URL +
+                stat.station_image.first().fb_image.version_path("medium"))
+            path = reverse('bimblog:station_detail',
+                kwargs={'build_slug': context['build'].slug,
+                'stat_slug': stat.slug})
+            stations.append({'id': stat.id, 'title': stat.title, 'path': path,
+                'fb_path': fb_path, 'lat': stat.lat, 'long': stat.long,
+                'intro': stat.intro})
         #add stations that don't belong to plans
         no_plan = context['stations'].filter(plan_id=None)
         if no_plan:
             context['no_plan'] = no_plan
         context['map_data'] = json.dumps({
             'build': build,
+            'plans': plans,
+            'stations': stations,
             'no_plan_trans': _("No plan"),
             'mapbox_token': settings.MAPBOX_TOKEN})
         return context
