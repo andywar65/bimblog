@@ -15,7 +15,32 @@ from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
     BuildingDeleteForm, BuildingPlanCreateForm, )
 
-class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
+class MapMixin:
+
+    def prepare_build_data(self, build):
+        build.fb_image.version_generate("medium")
+        fb_path = (settings.MEDIA_URL +
+            build.fb_image.version_path("medium"))
+        return {'title': build.title, 'intro': build.intro,
+            'path': build.get_full_path(), 'lat': build.lat,
+            'long': build.long, 'zoom': build.zoom, 'fb_path': fb_path}
+
+    def prepare_plan_data(self, plan):
+        return {'id': plan.id, 'geometry': plan.geometry,
+            'title': plan.title, 'visible': plan.visible}
+
+    def prepare_stat_data(self, stat):
+        stat.station_image.first().fb_image.version_generate("medium")
+        fb_path = (settings.MEDIA_URL +
+            stat.station_image.first().fb_image.version_path("medium"))
+        path = reverse('bimblog:station_detail',
+            kwargs={'build_slug': stat.build.slug,
+            'stat_slug': stat.slug})
+        return {'id': stat.id, 'title': stat.title, 'path': path,
+            'fb_path': fb_path, 'lat': stat.lat, 'long': stat.long,
+            'intro': stat.intro, 'plan_id': stat.plan_id}
+
+class BuildingListCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
     model = Building
     permission_required = 'bimblog.view_building'
     form_class = BuildingCreateForm
@@ -36,12 +61,7 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
         #not using values() because we have to manipulate entries
         builds = []
         for build in context['builds']:
-            build.fb_image.version_generate("medium")
-            fb_path = (settings.MEDIA_URL +
-                build.fb_image.version_path("medium"))
-            builds.append({'title': build.title, 'intro': build.intro,
-                'path': build.get_full_path(), 'lat': build.lat,
-                'long': build.long, 'fb_path': fb_path})
+            builds.append( self.prepare_build_data(build) )
         context['map_data'] = json.dumps({'builds': builds,
             'city_lat': settings.CITY_LAT,
             'city_long': settings.CITY_LONG,
@@ -63,7 +83,7 @@ class BuildingListCreateView( PermissionRequiredMixin, CreateView ):
                 kwargs={'slug': self.object.slug }) +
                 f'?created={self.object.title}')
 
-class BuildingDetailView(PermissionRequiredMixin, DetailView):
+class BuildingDetailView(PermissionRequiredMixin, MapMixin, DetailView):
     model = Building
     permission_required = 'bimblog.view_building'
     context_object_name = 'build'
@@ -98,35 +118,18 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
             context['stat_deleted'] = self.request.GET['stat_deleted']
         #we add the following to feed the map
         #building data
-        context['build'].fb_image.version_generate("medium")
-        fb_path = (settings.MEDIA_URL +
-            context['build'].fb_image.version_path("medium"))
-        build = {'title': context['build'].title,
-            'intro': context['build'].intro,
-            'lat': context['build'].lat, 'long': context['build'].long,
-            'zoom': context['build'].zoom,
-            'fb_path': fb_path}
+        build = self.prepare_build_data( context['build'] )
         #plan data
         plans = []
         for plan in context['plans'].reverse():
-            plans.append({'id': plan.id, 'geometry': plan.geometry,
-                'title': plan.title, 'visible': plan.visible})
+            plans.append(self.prepare_plan_data(plan))
         #station data
         stations = []
         for stat in context['stations']:
-            stat.station_image.first().fb_image.version_generate("medium")
-            fb_path = (settings.MEDIA_URL +
-                stat.station_image.first().fb_image.version_path("medium"))
-            path = reverse('bimblog:station_detail',
-                kwargs={'build_slug': context['build'].slug,
-                'stat_slug': stat.slug})
-            stations.append({'id': stat.id, 'title': stat.title, 'path': path,
-                'fb_path': fb_path, 'lat': stat.lat, 'long': stat.long,
-                'intro': stat.intro, 'plan_id': stat.plan_id})
-        #add stations that don't belong to plans
-        no_plan = context['stations'].filter(plan_id=None)
+            stations.append(self.prepare_stat_data(stat))
+        #are there stations that don't belong to plans?
         no_plan_status = False
-        if no_plan:
+        if context['stations'].filter(plan_id=None):
             no_plan_status = True
         context['map_data'] = json.dumps({
             'build': build,
@@ -137,7 +140,7 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
             'mapbox_token': settings.MAPBOX_TOKEN})
         return context
 
-class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
+class BuildingUpdateView(PermissionRequiredMixin, MapMixin, UpdateView):
     model = Building
     permission_required = 'bimblog.change_building'
     form_class = BuildingUpdateForm
@@ -147,14 +150,7 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         #we add the following to feed the map
         #building data
-        self.object.fb_image.version_generate("medium")
-        fb_path = (settings.MEDIA_URL +
-            self.object.fb_image.version_path("medium"))
-        build = {'title': self.object.title,
-            'intro': self.object.intro,
-            'lat': self.object.lat, 'long': self.object.long,
-            'zoom': self.object.zoom,
-            'fb_path': fb_path}
+        build = self.prepare_build_data( self.object )
         context['map_data'] = json.dumps({
             'build': build,
             'mapbox_token': settings.MAPBOX_TOKEN})
