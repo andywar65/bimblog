@@ -128,7 +128,6 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
         no_plan_status = False
         if no_plan:
             no_plan_status = True
-            context['no_plan'] = no_plan
         context['map_data'] = json.dumps({
             'build': build,
             'plans': plans,
@@ -147,7 +146,18 @@ class BuildingUpdateView(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         #we add the following to feed the map
-        context['mapbox_token'] = settings.MAPBOX_TOKEN
+        #building data
+        self.object.fb_image.version_generate("medium")
+        fb_path = (settings.MEDIA_URL +
+            self.object.fb_image.version_path("medium"))
+        build = {'title': self.object.title,
+            'intro': self.object.intro,
+            'lat': self.object.lat, 'long': self.object.long,
+            'zoom': self.object.zoom,
+            'fb_path': fb_path}
+        context['map_data'] = json.dumps({
+            'build': build,
+            'mapbox_token': settings.MAPBOX_TOKEN})
         return context
 
     def get_success_url(self):
