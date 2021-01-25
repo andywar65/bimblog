@@ -1,8 +1,3 @@
-{% load static %}
-{% load fb_versions %}
-{% load i18n %}
-{% load l10n %}
-
 <script type="text/javascript">
 
   const map_data = JSON.parse('{{ map_data | escapejs }}');
@@ -18,7 +13,7 @@
 
   if (map_data.plans){
     for (plan of map_data.plans){
-      let i = 1;
+      window['plan_' + plan.id ] = L.layerGroup();
       for (obj of plan.geometry){
         switch ( obj.type ){
           case 'polygon':
@@ -30,13 +25,12 @@
               .bindPopup(obj.popup);
             break;
           case 'circle':
-            var object = L.polyline( obj.coords, {radius: obj.radius,
+            var object = L.circle( obj.coords, {radius: obj.radius,
               color: obj.color, fillcolor: obj.color, fillOpacity: 0.5})
               .bindPopup(obj.popup);
             break;
         }
-        window['plan_' + plan.id + '_' + i] = object;
-        i = i+1;
+        object.addTo(window['plan_' + plan.id ]);
       }
     }
   }
@@ -47,6 +41,9 @@
       iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
       className: 'stat-marker'
     });
+    if (map_data.no_plan_status){
+      var no_plan = L.layerGroup();
+    }
     for (stat of map_data.stations){
       if (stat.fb_path){
         var content = "<h5><a href=\"" + stat.path + "\">" + stat.title +
@@ -58,24 +55,30 @@
       }
       var marker = L.marker([stat.lat, stat.long ], {icon: statMarker})
         .bindPopup( content, {minWidth: 300});
-      window['stat_' + stat.id ] = marker;
+      if (stat.plan_id){
+        marker.addTo(window['plan_' + stat.plan_id ]);
+      } else {
+        marker.addTo( no_plan );
+      }
     }
   }
 
-  {% if plans %}{% for plan in plans %}
-  var plan_{{ plan.id }} = L.layerGroup([{% for obj in plan.geometry %}plan_{{ plan.id }}_{{ forloop.counter }},{% endfor %}{% for stat in stations %}{% if stat.plan.id == plan.id %}stat_{{ stat.id }},{% endif %}{% endfor %}]);
-  {% endfor %}{% endif %}
-
-  {% if no_plan %}
-  var no_plan = L.layerGroup([{% for stat in no_plan %}stat_{{ stat.id }},{% endfor %}]);
-  {% endif %}
+  var layers = [ base_map, ];
+  if ( map_data.plans ){
+    for ( plan of map_data.plans ){
+      if ( plan.visible ){
+        layers.push( window[ 'plan_' + plan.id ]);
+      }
+    }
+  }
+  if ( map_data.no_plan_status ){
+    layers.push( no_plan )
+  }
 
   var mymap = L.map('mapid', {
     center: [ map_data.build.lat , map_data.build.long ],
     zoom: map_data.build.zoom ,
-    layers: [base_map,
-    {% if plans %}{% for plan in plans.reverse %}{% if plan.visible %}plan_{{ plan.id }},{% endif %}{% endfor %}{% endif %}
-    {% if no_plan %} no_plan{% endif %}]
+    layers: layers
   });
 
   const buildMarker = L.divIcon({
@@ -84,18 +87,24 @@
     className: 'build-marker'
   });
 
-  var content = "<h5>" + map_data.build.title + "</h5><img src=\"" + map_data.build.fb_path + "\">"
-  L.marker([ map_data.build.lat , map_data.build.long ], {icon: buildMarker}).bindPopup(content, {minWidth: 300}).addTo(mymap);
+  var content = "<h5>" + map_data.build.title + "</h5><img src=\"" +
+    map_data.build.fb_path + "\">";
+  L.marker([ map_data.build.lat , map_data.build.long ], {icon: buildMarker})
+    .bindPopup(content, {minWidth: 300}).addTo(mymap);
 
   var baseMaps = {
     "Base": base_map
   };
 
-  var overlayMaps = { {% if plans %}{% for plan in plans %}
-    "{{ plan.title }}": plan_{{ plan.id }},
-  {% endfor %}{% endif %}
-  {% if no_plan %}"{% translate 'No plan' %}": no_plan{% endif %}
-  };
+  var overlayMaps = {};
+  if ( map_data.plans ){
+    for ( plan of map_data.plans ){
+      overlayMaps[ plan.title ] = window[ 'plan_' + plan.id ];
+    }
+  }
+  if ( map_data.no_plan_status ){
+    overlayMaps[ map_data.no_plan_trans ] = no_plan;
+  }
 
   L.control.layers(baseMaps, overlayMaps).addTo(mymap);
 

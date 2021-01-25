@@ -108,8 +108,9 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
             'fb_path': fb_path}
         #plan data
         plans = []
-        for plan in context['plans']:
-            plans.append({'id': plan.id, 'geometry': plan.geometry})
+        for plan in context['plans'].reverse():
+            plans.append({'id': plan.id, 'geometry': plan.geometry,
+                'title': plan.title, 'visible': plan.visible})
         #station data
         stations = []
         for stat in context['stations']:
@@ -121,15 +122,18 @@ class BuildingDetailView(PermissionRequiredMixin, DetailView):
                 'stat_slug': stat.slug})
             stations.append({'id': stat.id, 'title': stat.title, 'path': path,
                 'fb_path': fb_path, 'lat': stat.lat, 'long': stat.long,
-                'intro': stat.intro})
+                'intro': stat.intro, 'plan_id': stat.plan_id})
         #add stations that don't belong to plans
         no_plan = context['stations'].filter(plan_id=None)
+        no_plan_status = False
         if no_plan:
+            no_plan_status = True
             context['no_plan'] = no_plan
         context['map_data'] = json.dumps({
             'build': build,
             'plans': plans,
             'stations': stations,
+            'no_plan_status': no_plan_status,
             'no_plan_trans': _("No plan"),
             'mapbox_token': settings.MAPBOX_TOKEN})
         return context
