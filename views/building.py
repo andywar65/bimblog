@@ -30,9 +30,12 @@ class MapMixin:
             'title': plan.title, 'visible': plan.visible}
 
     def prepare_stat_data(self, stat):
-        stat.station_image.first().fb_image.version_generate("medium")
-        fb_path = (settings.MEDIA_URL +
-            stat.station_image.first().fb_image.version_path("medium"))
+        if stat.station_image.first():
+            stat.station_image.first().fb_image.version_generate("medium")
+            fb_path = (settings.MEDIA_URL +
+                stat.station_image.first().fb_image.version_path("medium"))
+        else:
+            fb_path = ''
         path = reverse('bimblog:station_detail',
             kwargs={'build_slug': stat.build.slug,
             'stat_slug': stat.slug})
