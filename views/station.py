@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView,
@@ -12,8 +14,9 @@ from django.utils.translation import gettext as _
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( PhotoStationCreateForm,
     BuildingDeleteForm, StationImageCreateForm, StationImageUpdateForm, )
+from bimblog.views.building import MapMixin
 
-class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
+class PhotoStationCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
     model = PhotoStation
     permission_required = 'bimblog.add_photostation'
     form_class = PhotoStationCreateForm
@@ -37,9 +40,16 @@ class PhotoStationCreateView( PermissionRequiredMixin, CreateView ):
         elif 'stat_modified' in self.request.GET:
             context['stat_modified'] = self.request.GET['stat_modified']
         #we add the following to feed the map
-        context['build'] = self.build
-        context['plans'] = context['build'].building_plan.all()
-        context['mapbox_token'] = settings.MAPBOX_TOKEN
+        #building data
+        build = self.prepare_build_data( self.build )
+        #plan data
+        plans = []
+        for plan in self.build.building_plan.all().reverse():
+            plans.append(self.prepare_plan_data(plan))
+        context['map_data'] = json.dumps({
+            'build': build,
+            'plans': plans,
+            'mapbox_token': settings.MAPBOX_TOKEN})
 
         return context
 
