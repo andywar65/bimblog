@@ -63,7 +63,7 @@ class PhotoStationCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
                 kwargs={'slug': self.build.slug}) +
                 f'?stat_created={self.object.title}')
 
-class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
+class PhotoStationUpdateView( PermissionRequiredMixin, MapMixin, UpdateView ):
     model = PhotoStation
     permission_required = 'bimblog.change_photostation'
     form_class = PhotoStationCreateForm
@@ -82,8 +82,20 @@ class PhotoStationUpdateView( PermissionRequiredMixin, UpdateView ):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plans'] = self.build.building_plan.all()
-        context['mapbox_token'] = settings.MAPBOX_TOKEN
+        #we add the following to feed the map
+        #building data
+        build = self.prepare_build_data( self.build )
+        #plan data
+        plans = []
+        for plan in self.build.building_plan.all().reverse():
+            plans.append(self.prepare_plan_data(plan))
+        #station data
+        stat = self.prepare_stat_data( self.object )
+        context['map_data'] = json.dumps({
+            'build': build,
+            'plans': plans,
+            'stat': stat,
+            'mapbox_token': settings.MAPBOX_TOKEN})
         return context
 
     def get_success_url(self):
