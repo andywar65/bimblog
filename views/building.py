@@ -43,7 +43,36 @@ class MapMixin:
             'fb_path': fb_path, 'lat': stat.lat, 'long': stat.long,
             'intro': stat.intro, 'plan_id': stat.plan_id}
 
-class BuildingListCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
+class AlertMixin:
+    def add_alerts_to_context(self, context):
+        if 'created' in self.request.GET:
+            context['created'] = self.request.GET['created']
+        elif 'modified' in self.request.GET:
+            context['modified'] = self.request.GET['modified']
+        elif 'deleted' in self.request.GET:
+            context['deleted'] = self.request.GET['deleted']
+        elif 'plan_created' in self.request.GET:
+            context['plan_created'] = self.request.GET['plan_created']
+        elif 'plan_modified' in self.request.GET:
+            context['plan_modified'] = self.request.GET['plan_modified']
+        elif 'plan_deleted' in self.request.GET:
+            context['plan_deleted'] = self.request.GET['plan_deleted']
+        elif 'stat_created' in self.request.GET:
+            context['stat_created'] = self.request.GET['stat_created']
+        elif 'stat_modified' in self.request.GET:
+            context['stat_modified'] = self.request.GET['stat_modified']
+        elif 'stat_deleted' in self.request.GET:
+            context['stat_deleted'] = self.request.GET['stat_deleted']
+        elif 'img_created' in self.request.GET:
+            context['img_created'] = self.request.GET['img_created']
+        elif 'img_modified' in self.request.GET:
+            context['img_modified'] = self.request.GET['img_modified']
+        elif 'img_deleted' in self.request.GET:
+            context['img_deleted'] = self.request.GET['img_deleted']
+        return context
+
+class BuildingListCreateView( PermissionRequiredMixin, AlertMixin, MapMixin,
+    CreateView ):
     model = Building
     permission_required = 'bimblog.view_building'
     form_class = BuildingCreateForm
@@ -54,12 +83,7 @@ class BuildingListCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
         #list all buildings
         context['builds'] = Building.objects.all()
         #building alerts
-        if 'created' in self.request.GET:
-            context['created'] = self.request.GET['created']
-        elif 'modified' in self.request.GET:
-            context['modified'] = self.request.GET['modified']
-        elif 'deleted' in self.request.GET:
-            context['deleted'] = self.request.GET['deleted']
+        context = self.add_alerts_to_context(context)
         #we add the following to feed the map
         #not using values() because we have to manipulate entries
         builds = []
@@ -86,7 +110,8 @@ class BuildingListCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
                 kwargs={'slug': self.object.slug }) +
                 f'?created={self.object.title}')
 
-class BuildingDetailView(PermissionRequiredMixin, MapMixin, DetailView):
+class BuildingDetailView(PermissionRequiredMixin, AlertMixin, MapMixin,
+    DetailView):
     model = Building
     permission_required = 'bimblog.view_building'
     context_object_name = 'build'
@@ -103,22 +128,7 @@ class BuildingDetailView(PermissionRequiredMixin, MapMixin, DetailView):
         #add dates for images by date
         context['dates'] = StationImage.objects.filter(stat_id__in=context['stat_list']['all']).dates('date', 'day')
         #add alerts
-        if 'created' in self.request.GET:
-            context['created'] = self.request.GET['created']
-        elif 'modified' in self.request.GET:
-            context['modified'] = self.request.GET['modified']
-        elif 'plan_created' in self.request.GET:
-            context['plan_created'] = self.request.GET['plan_created']
-        elif 'plan_modified' in self.request.GET:
-            context['plan_modified'] = self.request.GET['plan_modified']
-        elif 'plan_deleted' in self.request.GET:
-            context['plan_deleted'] = self.request.GET['plan_deleted']
-        #elif 'stat_created' in self.request.GET:
-            #context['stat_created'] = self.request.GET['stat_created']
-        #elif 'stat_modified' in self.request.GET:
-            #context['stat_modified'] = self.request.GET['stat_modified']
-        elif 'stat_deleted' in self.request.GET:
-            context['stat_deleted'] = self.request.GET['stat_deleted']
+        context = self.add_alerts_to_context(context)
         #we add the following to feed the map
         #building data
         build = self.prepare_build_data( context['build'] )
@@ -194,7 +204,7 @@ class BuildingDeleteView(PermissionRequiredMixin, FormView):
                 kwargs={'slug': self.build.slug })
         return reverse('bimblog:building_list') + f'?deleted={self.build.title}'
 
-class BuildingPlanCreateView( PermissionRequiredMixin, CreateView ):
+class BuildingPlanCreateView( PermissionRequiredMixin, AlertMixin, CreateView ):
     model = BuildingPlan
     permission_required = 'bimblog.add_buildingplan'
     form_class = BuildingPlanCreateForm
@@ -210,10 +220,7 @@ class BuildingPlanCreateView( PermissionRequiredMixin, CreateView ):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'plan_created' in self.request.GET:
-            context['plan_created'] = self.request.GET['plan_created']
-        if 'plan_modified' in self.request.GET:
-            context['plan_modified'] = self.request.GET['plan_modified']
+        context = self.add_alerts_to_context(context)
         return context
 
     def get_success_url(self):

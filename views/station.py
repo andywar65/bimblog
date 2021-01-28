@@ -14,9 +14,10 @@ from django.utils.translation import gettext as _
 from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
 from bimblog.forms import ( PhotoStationCreateForm,
     BuildingDeleteForm, StationImageCreateForm, StationImageUpdateForm, )
-from bimblog.views.building import MapMixin
+from bimblog.views.building import AlertMixin, MapMixin
 
-class PhotoStationCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
+class PhotoStationCreateView( PermissionRequiredMixin, AlertMixin, MapMixin,
+    CreateView ):
     model = PhotoStation
     permission_required = 'bimblog.add_photostation'
     form_class = PhotoStationCreateForm
@@ -35,10 +36,7 @@ class PhotoStationCreateView( PermissionRequiredMixin, MapMixin, CreateView ):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'stat_created' in self.request.GET:
-            context['stat_created'] = self.request.GET['stat_created']
-        elif 'stat_modified' in self.request.GET:
-            context['stat_modified'] = self.request.GET['stat_modified']
+        context = self.add_alerts_to_context(context)
         #we add the following to feed the map
         #building data
         build = self.prepare_build_data( self.build )
@@ -143,7 +141,8 @@ class PhotoStationDeleteView(PermissionRequiredMixin, FormView):
             kwargs={'slug': self.build.slug}) +
             f'?stat_deleted={self.stat.title}')
 
-class StationImageListCreateView( PermissionRequiredMixin, CreateView ):
+class StationImageListCreateView( PermissionRequiredMixin, AlertMixin,
+    CreateView ):
     model = StationImage
     permission_required = 'bimblog.view_photostation'
     form_class = StationImageCreateForm
@@ -165,16 +164,7 @@ class StationImageListCreateView( PermissionRequiredMixin, CreateView ):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['stat'] = self.stat
-        if 'stat_created' in self.request.GET:
-            context['stat_created'] = self.request.GET['stat_created']
-        elif 'stat_modified' in self.request.GET:
-            context['stat_modified'] = self.request.GET['stat_modified']
-        elif 'img_created' in self.request.GET:
-            context['img_created'] = self.request.GET['img_created']
-        elif 'img_modified' in self.request.GET:
-            context['img_modified'] = self.request.GET['img_modified']
-        elif 'img_deleted' in self.request.GET:
-            context['img_deleted'] = self.request.GET['img_deleted']
+        context = self.add_alerts_to_context(context)
         #we add the following to feed the gallery
         context['main_gal_slug'] = get_random_string(7)
         #gallery images
