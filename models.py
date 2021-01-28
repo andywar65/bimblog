@@ -60,6 +60,8 @@ class Building(models.Model):
         help_text=_("Coordinates from Google Maps or https://openstreetmap.org"))
     zoom = models.FloatField(_("Zoom factor"), default = settings.CITY_ZOOM,
         help_text=_("Maximum should be 21"))
+    disciplines = models.ManyToManyField(Discipline,
+        blank = True, verbose_name = _('Show only plans belonging to:'), )
 
 
     def __str__(self):
@@ -90,6 +92,9 @@ class BuildingPlan(models.Model):
 
     build = models.ForeignKey(Building, on_delete = models.CASCADE,
         related_name='building_plan', verbose_name = _('Building'))
+    disc = models.ForeignKey(Discipline, on_delete = models.SET_NULL,
+        related_name='discipline_plan', verbose_name = _('Discipline'),
+        null=True, blank=True)
     title = models.CharField(_('Name'),
         help_text=_("Name of the building plan"), max_length = 50, )
     slug = models.SlugField(max_length=100, editable=False, null=True)
