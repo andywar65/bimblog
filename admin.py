@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
-from .models import Building, BuildingPlan, PhotoStation, StationImage
+from .models import (Building, BuildingPlan, PhotoStation, StationImage,
+    Discipline)
 
 class BuildingPlanInline(admin.TabularInline):
     model = BuildingPlan
@@ -35,3 +36,7 @@ class PhotoStationAdmin(admin.ModelAdmin):
     list_display = ( 'title', 'intro', 'build', 'plan', 'lat', 'long')
     list_editable = ( 'lat', 'long')
     inlines = [ StationImageInline,  ]
+
+@admin.register(Discipline)
+class DisciplineAdmin(admin.ModelAdmin):
+    list_display = ( 'title', 'intro', )

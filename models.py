@@ -14,8 +14,23 @@ from filebrowser.base import FileObject
 
 from project.utils import generate_unique_slug
 from .map_utils import workflow
-#from .choices import *
-#from .map_utils import workflow
+
+class Discipline(models.Model):
+    title = models.CharField(_('Title'),
+        help_text=_("Discipline name"),
+        max_length = 50, )
+    intro = models.CharField(_('Introduction'),
+        null=True, blank=True,
+        help_text = _('Few words to describe the discipline'),
+        max_length = 100)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _('Discipline')
+        verbose_name_plural = _('Disciplines')
+        ordering = ('title', )
 
 def building_default_intro():
     return _('Another Building by %(website)s!') % {'website': settings.WEBSITE_NAME}

@@ -13,11 +13,19 @@ def create_bimblog_group(sender, **kwargs):
             'view_photostation', 'add_photostation', 'change_photostation',
             'delete_photostation',
             'view_stationimage', 'add_stationimage', 'change_stationimage',
-            'delete_stationimage',))
+            'delete_stationimage', 'view_discipline', 'add_discipline',
+            'change_discipline', 'delete_discipline',))
         grp.permissions.set(permissions)
+
+def create_disciplines(sender, **kwargs):
+    from bimblog.models import Discipline
+    Discipline.objects.get_or_create(title=_('Architecture'))
+    Discipline.objects.get_or_create(title=_('MEP'))
+    Discipline.objects.get_or_create(title=_('Structure'))
 
 class BimblogConfig(AppConfig):
     name = 'bimblog'
 
     def ready(self):
         post_migrate.connect(create_bimblog_group, sender=self)
+        post_migrate.connect(create_disciplines, sender=self)
