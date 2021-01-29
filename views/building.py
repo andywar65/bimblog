@@ -121,13 +121,8 @@ class BuildingDetailView(PermissionRequiredMixin, AlertMixin, MapMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         #add plans and stations
-        disc_list = context['build'].disciplines.all().values_list('id',
-            flat=True)
-        context['plans'] = context['build'].building_plan.filter(Q(disc=None)|
-            Q(disc_id__in=disc_list))
-        plan_list = context['plans'].values_list('id', flat=True)
-        context['stations'] = context['build'].building_station.filter(Q(plan=None)|
-            Q(plan_id__in=plan_list))
+        context['plans'] = context['build'].building_plan.all()
+        context['stations'] = context['build'].building_station.all()
         #add station list
         stat_list = context['stations'].values_list('id', flat=True)
         #add dates for images by date
@@ -138,12 +133,19 @@ class BuildingDetailView(PermissionRequiredMixin, AlertMixin, MapMixin,
         #building data
         build = self.prepare_build_data( context['build'] )
         #plan data
+        disc_list = context['build'].disciplines.all().values_list('id',
+            flat=True)
+        disc_plans = context['plans'].filter(Q(disc=None)|
+            Q(disc_id__in=disc_list))
         plans = []
-        for plan in context['plans'].reverse():
+        for plan in disc_plans.reverse():
             plans.append(self.prepare_plan_data(plan))
         #station data
+        plan_list = disc_plans.values_list('id', flat=True)
+        disc_stat = context['stations'].filter(Q(plan=None)|
+            Q(plan_id__in=plan_list))
         stations = []
-        for stat in context['stations']:
+        for stat in disc_stat:
             stations.append(self.prepare_stat_data(stat))
         #are there stations that don't belong to plans?
         no_plan_status = False
