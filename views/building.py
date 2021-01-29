@@ -123,17 +123,15 @@ class BuildingDetailView(PermissionRequiredMixin, AlertMixin, MapMixin,
         #add plans and stations
         disc_list = context['build'].disciplines.all().values_list('id',
             flat=True)
-        print(disc_list)
         context['plans'] = context['build'].building_plan.filter(Q(disc=None)|
             Q(disc_id__in=disc_list))
         plan_list = context['plans'].values_list('id', flat=True)
         context['stations'] = context['build'].building_station.filter(Q(plan=None)|
             Q(plan_id__in=plan_list))
-        #add station lists
-        context['stat_list'] = {}
-        context['stat_list']['all'] = context['stations'].values_list('id')
+        #add station list
+        stat_list = context['stations'].values_list('id', flat=True)
         #add dates for images by date
-        context['dates'] = StationImage.objects.filter(stat_id__in=context['stat_list']['all']).dates('date', 'day')
+        context['dates'] = StationImage.objects.filter(stat_id__in=stat_list).dates('date', 'day')
         #add alerts
         context = self.add_alerts_to_context(context)
         #we add the following to feed the map
