@@ -314,11 +314,16 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
     form_class = DisciplineCreateForm
     template_name = 'bimblog/discipline_list_create.html'
 
+    def setup(self, request, *args, **kwargs):
+        super(DisciplineListCreateView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['slug'] )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        #list all buildings
+        #list all disciplines
         context['discs'] = Discipline.objects.all()
-        #building alerts
+        #discipline alerts
         context = self.add_alerts_to_context(context)
         return context
 
@@ -329,8 +334,10 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
-            return (reverse('bimblog:discipline_list_create') +
+            return (reverse('bimblog:discipline_list_create',
+                kwargs={'slug': self.build.slug}) +
                 f'?disc_created={self.object.title}')
         else:
-            return (reverse('bimblog:building_list') +
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug}) +
                 f'?disc_created={self.object.title}')

@@ -49,7 +49,7 @@
         + <i class="fa fa-camera"></i></a>
     {% endif %}
     {% if perms.bimblog.add_discipline %}
-      <a class="btn btn-secondary" href="{% url 'bimblog:discipline_list_create' %}" title="{% translate "Add discipline" %}">
+      <a class="btn btn-secondary" href="{% url 'bimblog:discipline_list_create' slug=build.slug%}" title="{% translate "Add discipline" %}">
         + <i class="fa fa-graduation-cap"></i></a>
     {% endif %}
   </div>
