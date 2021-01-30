@@ -47,6 +47,10 @@
       <a class="btn btn-success" href="{% url 'bimblog:station_create' slug=build.slug %}" title="{% translate "Add photo station" %}">
         + <i class="fa fa-camera"></i></a>
     {% endif %}
+    {% if perms.bimblog.add_discipline %}
+      <a class="btn btn-secondary" href="{% url 'bimblog:discipline_list_create' %}" title="{% translate "Add discipline" %}">
+        + <i class="fa fa-graduation-cap"></i></a>
+    {% endif %}
   </div>
 </div>
 <div class="row">
