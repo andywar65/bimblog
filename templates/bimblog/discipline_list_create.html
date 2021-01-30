@@ -30,7 +30,7 @@
     <tbody>
       {% for disc in discs.all %}
       <tr>
-        <td><a href="#">{{ disc.title }}</a></td>
+        <td><a href="{% url 'bimblog:discipline_change' slug=build.slug pk=disc.id %}">{{ disc.title }}</a></td>
         <td>{{ disc.intro }}</td>
       </tr>
       {% endfor %}

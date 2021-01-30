@@ -323,6 +323,7 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
         context = super().get_context_data(**kwargs)
         #list all disciplines
         context['discs'] = Discipline.objects.all()
+        context['build'] = self.build
         #discipline alerts
         context = self.add_alerts_to_context(context)
         return context
@@ -341,3 +342,59 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
             return (reverse('bimblog:building_detail',
                 kwargs={'slug': self.build.slug}) +
                 f'?disc_created={self.object.title}')
+
+class DisciplineUpdateView( PermissionRequiredMixin, UpdateView ):
+    model = Discipline
+    permission_required = 'bimblog.change_discipline'
+    form_class = DisciplineCreateForm
+    template_name = 'bimblog/discipline_form_update.html'
+
+    def setup(self, request, *args, **kwargs):
+        super(DisciplineUpdateView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['slug'] )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['build'] = self.build
+        return context
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:discipline_list_create',
+                kwargs={'slug': self.build.slug}) +
+                f'?disc_modified={self.object.title}')
+        else:
+            return (reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug}) +
+                f'?disc_modified={self.object.title}')
+
+class DisciplineDeleteView(PermissionRequiredMixin, FormView):
+    permission_required = 'bimblog.delete_discipline'
+    form_class = BuildingDeleteForm
+    template_name = 'bimblog/discipline_form_delete.html'
+
+    def setup(self, request, *args, **kwargs):
+        super(DisciplineDeleteView, self).setup(request, *args, **kwargs)
+        self.build = get_object_or_404( Building,
+            slug = self.kwargs['slug'] )
+        self.disc = get_object_or_404( Discipline,
+            id = self.kwargs['pk'] )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.disc.title
+        return context
+
+    def form_valid(self, form):
+        if not 'cancel' in self.request.POST:
+            self.disc.delete()
+        return super(DisciplineDeleteView, self).form_valid(form)
+
+    def get_success_url(self):
+        if 'cancel' in self.request.POST:
+            return reverse('bimblog:building_detail',
+                kwargs={'slug': self.build.slug})
+        return (reverse('bimblog:building_detail',
+            kwargs={'slug': self.build.slug}) +
+            f'?disc_deleted={self.disc.title}')
