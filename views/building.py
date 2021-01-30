@@ -12,9 +12,10 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from bimblog.models import Building, BuildingPlan, PhotoStation, StationImage
+from bimblog.models import (Building, BuildingPlan, PhotoStation, StationImage,
+    Discipline)
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
-    BuildingDeleteForm, BuildingPlanCreateForm, )
+    BuildingDeleteForm, BuildingPlanCreateForm, DisciplineCreateForm)
 
 class MapMixin:
 
@@ -70,6 +71,12 @@ class AlertMixin:
             context['img_modified'] = self.request.GET['img_modified']
         elif 'img_deleted' in self.request.GET:
             context['img_deleted'] = self.request.GET['img_deleted']
+        elif 'disc_created' in self.request.GET:
+            context['disc_created'] = self.request.GET['disc_created']
+        elif 'disc_modified' in self.request.GET:
+            context['disc_modified'] = self.request.GET['disc_modified']
+        elif 'disc_deleted' in self.request.GET:
+            context['disc_deleted'] = self.request.GET['disc_deleted']
         return context
 
 class BuildingListCreateView( PermissionRequiredMixin, AlertMixin, MapMixin,
@@ -299,3 +306,31 @@ class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
         return (reverse('bimblog:building_detail',
             kwargs={'slug': self.build.slug}) +
             f'?plan_deleted={self.plan.title}')
+
+class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
+    CreateView ):
+    model = Discipline
+    permission_required = 'bimblog.view_discipline'
+    form_class = DisciplineCreateForm
+    template_name = 'bimblog/discipline_list_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #list all buildings
+        context['discs'] = Discipline.objects.all()
+        #building alerts
+        context = self.add_alerts_to_context(context)
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.has_perm('bimblog.add_discipline'):
+            raise Http404(_("User has no permission to add disciplines"))
+        return super(DisciplineListCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        if 'add_another' in self.request.POST:
+            return (reverse('bimblog:discipline_list_create') +
+                f'?disc_created={self.object.title}')
+        else:
+            return (reverse('bimblog:building_list') +
+                f'?disc_created={self.object.title}')

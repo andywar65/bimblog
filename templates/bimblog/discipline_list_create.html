@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{{ website.acro }} | {% translate "Disciplines" %}{% endblock title %}
+
+{% block content %}
+{% include "bimblog/includes/discipline_alerts.html" %}
+<div class="row">
+  <div class="col col-md-8">
+    <h4><strong>{% translate "List of disciplines" %}</strong></h4>
+  </div>
+  <div class="col col-md-4 text-right">
+    {% if perms.bimblog.add_building %}
+      <a class="btn btn-secondary" href="#discipline-create" title="{% translate "Add discipline" %}">
+        + <i class="fa fa-graduation-cap"></i></a>
+    {% endif %}
+  </div>
+</div>
+{% if discs %}
+<hr class="mb-4">
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">{% translate 'Edit Discipline' %}</th>
+        <th scope="col">{% translate 'Description' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for disc in discs.all %}
+      <tr>
+        <td><a href="#">{{ disc.title }}</a></td>
+        <td>{{ disc.intro }}</td>
+      </tr>
+      {% endfor %}
+    <tbody>
+  </table>
+</div>
+{% else %}
+{% translate "There are no disciplines, please add one" %}.
+{% endif %}
+<div class="row" id="discipline-create">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <hr class="mb-4">
+    <h4><strong>{% translate "Add discipline" %}</strong></h4>
+    {% if perms.bimblog.add_discipline %}
+    {% include "bimblog/includes/hello_formula.html" %}
+    <hr class="mb-4">
+    {% include "bimblog/includes/form_errors.html" %}
+    <form action="" method="post" class="needs-validation" novalidate>
+        {{ form|crispy }}
+        <hr class="mb-4">
+          {% include "bimblog/includes/add_buttons.html" %}
+        <hr class="mb-4">
+      {% csrf_token %}
+    </form>
+    {% else %}
+    {% translate "You don't have permissions to add disciplines" %}.
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

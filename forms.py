@@ -2,7 +2,8 @@ from django import forms
 from django.forms import ModelForm
 from django.utils.translation import gettext as _
 
-from .models import Building, BuildingPlan, PhotoStation, StationImage
+from .models import (Building, BuildingPlan, PhotoStation, StationImage,
+    Discipline)
 
 class BuildingCreateForm(ModelForm):
     image = forms.ImageField(label=_('Image'), required=True)
@@ -61,3 +62,9 @@ class StationImageUpdateForm(ModelForm):
     class Meta:
         model = StationImage
         fields = ( 'image', 'stat', 'date', 'caption')
+
+class DisciplineCreateForm(ModelForm):
+
+    class Meta:
+        model = Discipline
+        fields = '__all__'
