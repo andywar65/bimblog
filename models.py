@@ -19,7 +19,7 @@ class Discipline(models.Model):
     title = models.CharField(_('Title'),
         help_text=_("Discipline name"),
         max_length = 50, )
-    intro = models.CharField(_('Introduction'),
+    intro = models.CharField(_('Description'),
         null=True, blank=True,
         help_text = _('Few words to describe the discipline'),
         max_length = 100)

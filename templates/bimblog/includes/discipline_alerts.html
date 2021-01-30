@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if created %}
+{% if disc_created %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     {% blocktranslate with link=disc_created %}
     Discipline <strong>{{ link }}</strong> successfully created!
@@ -9,7 +9,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-{% elif modified %}
+{% elif disc_modified %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     {% blocktranslate with link=disc_modified %}
     Discipline <strong>{{ link }}</strong> successfully modified!
@@ -18,7 +18,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-{% elif deleted %}
+{% elif disc_deleted %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     {% blocktranslate with link=disc_deleted %}
     Discipline <strong>{{ link }}</strong> successfully deleted!
