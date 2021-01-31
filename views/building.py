@@ -393,8 +393,8 @@ class DisciplineDeleteView(PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         if 'cancel' in self.request.POST:
-            return reverse('bimblog:building_detail',
-                kwargs={'slug': self.build.slug})
+            return reverse('bimblog:discipline_change',
+                kwargs={'slug': self.build.slug, 'pk': self.disc.id})
         return (reverse('bimblog:building_detail',
             kwargs={'slug': self.build.slug}) +
             f'?disc_deleted={self.disc.title}')
