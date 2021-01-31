@@ -14,14 +14,16 @@ def create_bimblog_group(sender, **kwargs):
             'delete_photostation',
             'view_stationimage', 'add_stationimage', 'change_stationimage',
             'delete_stationimage', 'view_discipline', 'add_discipline',
-            'change_discipline', 'delete_discipline',))
+            'change_discipline', 'delete_discipline', 'view_disciplinenode',
+            'add_disciplinenode', 'change_disciplinenode',
+            'delete_disciplinenode',))
         grp.permissions.set(permissions)
 
 def create_disciplines(sender, **kwargs):
-    from bimblog.models import Discipline
-    Discipline.objects.get_or_create(title=_('Architecture'))
-    Discipline.objects.get_or_create(title=_('MEP'))
-    Discipline.objects.get_or_create(title=_('Structure'))
+    from bimblog.models import DisciplineNode
+    DisciplineNode.objects.get_or_create(title=_('Architecture'), depth=1, path='0001')
+    DisciplineNode.objects.get_or_create(title=_('MEP'), depth=1, path='0002')
+    DisciplineNode.objects.get_or_create(title=_('Structure'), depth=1, path='0003')
 
 class BimblogConfig(AppConfig):
     name = 'bimblog'

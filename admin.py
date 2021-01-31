@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
+from treebeard.admin import TreeAdmin
+from treebeard.forms import movenodeform_factory
+
 from .models import (Building, BuildingPlan, PhotoStation, StationImage,
-    Discipline)
+    DisciplineNode)
 
 class BuildingPlanInline(admin.TabularInline):
     model = BuildingPlan
@@ -37,6 +40,20 @@ class PhotoStationAdmin(admin.ModelAdmin):
     list_editable = ( 'lat', 'long')
     inlines = [ StationImageInline,  ]
 
-@admin.register(Discipline)
-class DisciplineAdmin(admin.ModelAdmin):
-    list_display = ( 'title', 'intro', )
+#@admin.register(Discipline)
+#class DisciplineAdmin(admin.ModelAdmin):
+    #list_display = ( 'title', 'intro', )
+
+class DisciplineNodeAdmin(TreeAdmin):
+    form = movenodeform_factory(DisciplineNode)
+    
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'intro'),
+        }),
+        (None, {
+            'fields': ('_position', '_ref_node_id'),
+        }),
+        )
+
+admin.site.register(DisciplineNode, DisciplineNodeAdmin)
