@@ -80,6 +80,8 @@ class Building(models.Model):
         help_text=_("Maximum should be 21"))
     disciplines = models.ManyToManyField(Discipline,
         blank = True, verbose_name = _('Show only plans belonging to:'), )
+    disciplinesn = models.ManyToManyField(DisciplineNode,
+        blank = True, verbose_name = _('Show only plans belonging to:'), )
 
 
     def __str__(self):
@@ -112,6 +114,9 @@ class BuildingPlan(models.Model):
         related_name='building_plan', verbose_name = _('Building'))
     disc = models.ForeignKey(Discipline, on_delete = models.SET_NULL,
         related_name='discipline_plan', verbose_name = _('Discipline'),
+        null=True, blank=True)
+    discn = models.ForeignKey(DisciplineNode, on_delete = models.SET_NULL,
+        related_name='disciplinen_plan', verbose_name = _('Discipline'),
         null=True, blank=True)
     title = models.CharField(_('Name'),
         help_text=_("Name of the building plan"), max_length = 50, )
