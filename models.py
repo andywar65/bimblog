@@ -62,7 +62,8 @@ class Building(models.Model):
     zoom = models.FloatField(_("Zoom factor"), default = settings.CITY_ZOOM,
         help_text=_("Maximum should be 21"))
     disciplinesn = models.ManyToManyField(DisciplineNode,
-        blank = True, verbose_name = _('Show only plans belonging to:'), )
+        blank = True, verbose_name = _('Disciplines'),
+        help_text=_("Show only plans belonging to chosen disciplines") )
 
 
     def __str__(self):
