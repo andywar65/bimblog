@@ -17,6 +17,9 @@ from project.utils import generate_unique_slug
 from .map_utils import workflow
 
 class DisciplineNode(MP_Node):
+    parent = models.ForeignKey('self', verbose_name = _('Parent discipline'),
+        null=True, blank=True,
+        on_delete = models.SET_NULL)
     title = models.CharField(_('Title'),
         help_text=_("Discipline name"),
         max_length = 50, )
