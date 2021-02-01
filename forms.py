@@ -83,17 +83,12 @@ class NodeChoiceField(ModelChoiceField):
             prefix = prefix + '-'
         return prefix + obj.title
 
-class DisciplineNodeCreateForm(forms.Form):
-    parnt = NodeChoiceField( label=_('Parent discipline'),
-        queryset=DisciplineNode.objects.all(), required=False,
-        help_text = _('Only staff can modify this choice') )
-    title = forms.CharField( label=_('Title'),
-        help_text=_("Discipline name"),
-        max_length = 50, required=True)
-    intro = forms.CharField( label=_('Description'),
-        required=False, empty_value=None,
-        help_text = _('Few words to describe the discipline'),
-        max_length = 100)
+class DisciplineNodeCreateForm(ModelForm):
+    parent = NodeChoiceField( label=_('Parent discipline'),
+        queryset=DisciplineNode.objects.all(), required=False,)
+    class Meta:
+        model = DisciplineNode
+        fields = ('parent', 'title', 'intro')
 
 class DisciplineNodeUpdateForm(ModelForm):
 

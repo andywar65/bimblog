@@ -1,5 +1,6 @@
 import json
 
+from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
@@ -309,7 +310,8 @@ class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
             f'?plan_deleted={self.plan.title}')
 
 class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
-    FormView ):
+    CreateView ):
+    model = DisciplineNode
     permission_required = 'bimblog.view_disciplinenode'
     form_class = DisciplineNodeCreateForm
     template_name = 'bimblog/discipline_list_create.html'
@@ -335,16 +337,15 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
         if not self.request.user.has_perm('bimblog.add_disciplinenode'):
             raise Http404(_("User has no permission to add disciplines"))
         #can't use save method because dealing with MP_Node
-        if form.cleaned_data['parnt']:
-            parent = form.cleaned_data['parnt']
-            self.object = parent.add_child(
-                title=form.cleaned_data['title'],
-                intro=form.cleaned_data['intro'])
+        if form.instance.parent:
+            self.object = form.instance.parent.add_child(
+                title=form.instance.title,
+                intro=form.instance.intro)
         else:
             self.object = DisciplineNode.add_root(
-                title=form.cleaned_data['title'],
-                intro=form.cleaned_data['intro'])
-        return super(DisciplineListCreateView, self).form_valid(form)
+                title=form.instance.title,
+                intro=form.instance.intro)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
