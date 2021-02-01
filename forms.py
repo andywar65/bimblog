@@ -72,7 +72,8 @@ class NodeChoiceField(ModelChoiceField):
 
 class DisciplineNodeCreateForm(forms.Form):
     parent = NodeChoiceField( label=_('Parent discipline'),
-        queryset=DisciplineNode.objects.all(), required=False )
+        queryset=DisciplineNode.objects.all(), required=False,
+        help_text = _('Only staff can modify this choice') )
     title = forms.CharField( label=_('Title'),
         help_text=_("Discipline name"),
         max_length = 50, required=True)
