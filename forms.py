@@ -69,8 +69,13 @@ class DisciplineCreateForm(ModelForm):
         model = Discipline
         fields = '__all__'
 
-class DisciplineNodeCreateForm(ModelForm):
-
-    class Meta:
-        model = DisciplineNode
-        fields = ('title', 'intro', )
+class DisciplineNodeCreateForm(forms.Form):
+    parent = forms.ModelChoiceField( label=_('Parent discipline'),
+        queryset=DisciplineNode.objects.all(), required=False )
+    title = forms.CharField( label=_('Title'),
+        help_text=_("Discipline name"),
+        max_length = 50, required=True)
+    intro = forms.CharField( label=_('Description'),
+        required=False, empty_value=None,
+        help_text = _('Few words to describe the discipline'),
+        max_length = 100)

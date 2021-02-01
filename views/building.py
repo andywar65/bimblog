@@ -310,8 +310,7 @@ class BuildingPlanDeleteView(PermissionRequiredMixin, FormView):
             f'?plan_deleted={self.plan.title}')
 
 class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
-    CreateView ):
-    model = DisciplineNode
+    FormView ):
     permission_required = 'bimblog.view_disciplinenode'
     form_class = DisciplineNodeCreateForm
     template_name = 'bimblog/discipline_list_create.html'
@@ -323,9 +322,8 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        #list all disciplines
-        #context['discs'] = DisciplineNode.objects.all()
         context['build'] = self.build
+        #list all disciplines as tree
         context['annotated_lists'] = []
         root_pages = DisciplineNode.get_root_nodes()
         for root_page in root_pages:
@@ -338,8 +336,15 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
         if not self.request.user.has_perm('bimblog.add_disciplinenode'):
             raise Http404(_("User has no permission to add disciplines"))
         #can't use save method because dealing with MP_Node
-        self.object = DisciplineNode.add_root(title=form.instance.title,
-            intro=form.instance.intro)
+        if form.cleaned_data['parent']:
+            parent = form.cleaned_data['parent']
+            self.object = parent.add_child(
+                title=form.cleaned_data['title'],
+                intro=form.cleaned_data['intro'])
+        else:
+            self.object = DisciplineNode.add_root(
+                title=form.cleaned_data['title'],
+                intro=form.cleaned_data['intro'])
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
