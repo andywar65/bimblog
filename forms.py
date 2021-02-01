@@ -1,12 +1,22 @@
 from django import forms
-from django.forms import ModelForm, ModelChoiceField
+from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 from django.utils.translation import gettext as _
 
 from .models import (Building, BuildingPlan, PhotoStation, StationImage,
     DisciplineNode)
 
+class NodeMultipleChoiceField(ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        prefix = ''
+        for i in range( obj.depth -1 ):
+            prefix = prefix + '-'
+        return prefix + obj.title
+
 class BuildingCreateForm(ModelForm):
     image = forms.ImageField(label=_('Image'), required=True)
+    disciplinesn = NodeMultipleChoiceField(label=_('Disciplines'),
+        queryset=DisciplineNode.objects.all(), required=False,
+        help_text=_("Show only plans belonging to chosen disciplines"))
 
     class Meta:
         model = Building
@@ -14,6 +24,9 @@ class BuildingCreateForm(ModelForm):
             'zoom', 'disciplinesn')
 
 class BuildingUpdateForm(ModelForm):
+    disciplinesn = NodeMultipleChoiceField(label=_('Disciplines'),
+        queryset=DisciplineNode.objects.all(), required=False,
+        help_text=_("Show only plans belonging to chosen disciplines"))
 
     class Meta:
         model = Building
@@ -71,7 +84,7 @@ class NodeChoiceField(ModelChoiceField):
         return prefix + obj.title
 
 class DisciplineNodeCreateForm(forms.Form):
-    parent = NodeChoiceField( label=_('Parent discipline'),
+    parnt = NodeChoiceField( label=_('Parent discipline'),
         queryset=DisciplineNode.objects.all(), required=False,
         help_text = _('Only staff can modify this choice') )
     title = forms.CharField( label=_('Title'),

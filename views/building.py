@@ -335,8 +335,8 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
         if not self.request.user.has_perm('bimblog.add_disciplinenode'):
             raise Http404(_("User has no permission to add disciplines"))
         #can't use save method because dealing with MP_Node
-        if form.cleaned_data['parent']:
-            parent = form.cleaned_data['parent']
+        if form.cleaned_data['parnt']:
+            parent = form.cleaned_data['parnt']
             self.object = parent.add_child(
                 title=form.cleaned_data['title'],
                 intro=form.cleaned_data['intro'])
