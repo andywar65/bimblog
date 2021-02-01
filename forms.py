@@ -73,4 +73,4 @@ class DisciplineNodeCreateForm(ModelForm):
 
     class Meta:
         model = DisciplineNode
-        fields = '__all__'
+        fields = ('title', 'intro', )
