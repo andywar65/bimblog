@@ -368,6 +368,11 @@ class DisciplineUpdateView( PermissionRequiredMixin, UpdateView ):
         self.build = get_object_or_404( Building,
             slug = self.kwargs['slug'] )
 
+    def get_initial(self):
+        initial = super( DisciplineUpdateView, self ).get_initial()
+        initial['parent'] = self.object.get_parent()
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['build'] = self.build

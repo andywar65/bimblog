@@ -91,7 +91,8 @@ class DisciplineNodeCreateForm(ModelForm):
         fields = ('parent', 'title', 'intro')
 
 class DisciplineNodeUpdateForm(ModelForm):
-
+    parent = NodeChoiceField( label=_('Parent discipline'),
+        queryset=DisciplineNode.objects.all(), required=False,)
     class Meta:
         model = DisciplineNode
-        fields = ('title', 'intro')
+        fields = ('parent', 'title', 'intro')
