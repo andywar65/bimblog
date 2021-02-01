@@ -21,9 +21,18 @@ def create_bimblog_group(sender, **kwargs):
 
 def create_disciplines(sender, **kwargs):
     from bimblog.models import DisciplineNode
-    DisciplineNode.objects.get_or_create(title=_('Architecture'), depth=1, path='0001')
-    DisciplineNode.objects.get_or_create(title=_('MEP'), depth=1, path='0002')
-    DisciplineNode.objects.get_or_create(title=_('Structure'), depth=1, path='0003')
+    try:
+        DisciplineNode.objects.get(title=_('Architecture'))
+    except:
+        DisciplineNode.add_root(title=_('Architecture'))
+    try:
+        DisciplineNode.objects.get(title=_('MEP'))
+    except:
+        DisciplineNode.add_root(title=_('MEP'))
+    try:
+        DisciplineNode.objects.get(title=_('Structure'))
+    except:
+        DisciplineNode.add_root(title=_('Structure'))
 
 class BimblogConfig(AppConfig):
     name = 'bimblog'
