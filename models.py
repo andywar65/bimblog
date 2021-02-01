@@ -48,7 +48,7 @@ class DisciplineNode(MP_Node):
     class Meta:
         verbose_name = _('Discipline')
         verbose_name_plural = _('Disciplines')
-        ordering = ('title', )
+        #ordering = ('title', )
 
 def building_default_intro():
     return _('Another Building by %(website)s!') % {'website': settings.WEBSITE_NAME}

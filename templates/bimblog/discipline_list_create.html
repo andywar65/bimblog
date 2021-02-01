@@ -17,26 +17,22 @@
     {% endif %}
   </div>
 </div>
-{% if discs %}
 <hr class="mb-4">
-<div class="table-responsive">
-  <table class="table table-hover">
-    <thead class="thead-light">
-      <tr>
-        <th scope="col">{% translate 'Edit Discipline' %}</th>
-        <th scope="col">{% translate 'Description' %}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for disc in discs.all %}
-      <tr>
-        <td><a href="{% url 'bimblog:discipline_change' slug=build.slug pk=disc.id %}">{{ disc.title }}</a></td>
-        <td>{{ disc.intro }}</td>
-      </tr>
+{% if annotated_lists %}
+  {% for annotated_list in annotated_lists %}
+    {% for disc, info in annotated_list %}
+      {% if info.open %}
+          <ul><li>
+      {% else %}
+          </li><li>
+      {% endif %}
+          <a href="#">{{ disc.title }}</a>
+          {% if disc.intro %}<em>- {{ disc.intro }}</em>{% endif %}
+      {% for close in info.close %}
+          </li></ul>
       {% endfor %}
-    <tbody>
-  </table>
-</div>
+    {% endfor %}
+  {% endfor %}
 {% if perms.bimblog.change_disciplinenode and user.is_staff %}
 <p><a href="/admin/bimblog/disciplinenode">{% trans "Modify tree" %}</a></p>
 {% endif %}

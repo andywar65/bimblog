@@ -324,8 +324,12 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         #list all disciplines
-        context['discs'] = DisciplineNode.objects.all()
+        #context['discs'] = DisciplineNode.objects.all()
         context['build'] = self.build
+        context['annotated_lists'] = []
+        root_pages = DisciplineNode.get_root_nodes()
+        for root_page in root_pages:
+            context['annotated_lists'].append(DisciplineNode.get_annotated_list(parent=root_page))
         #discipline alerts
         context = self.add_alerts_to_context(context)
         return context
