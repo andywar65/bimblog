@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.utils.translation import gettext as _
 
 from .models import (Building, BuildingPlan, PhotoStation, StationImage,
-    Discipline, DisciplineNode)
+    DisciplineNode)
 
 class BuildingCreateForm(ModelForm):
     image = forms.ImageField(label=_('Image'), required=True)
@@ -62,12 +62,6 @@ class StationImageUpdateForm(ModelForm):
     class Meta:
         model = StationImage
         fields = ( 'image', 'stat', 'date', 'caption')
-
-class DisciplineCreateForm(ModelForm):
-
-    class Meta:
-        model = Discipline
-        fields = '__all__'
 
 class DisciplineNodeCreateForm(forms.Form):
     parent = forms.ModelChoiceField( label=_('Parent discipline'),

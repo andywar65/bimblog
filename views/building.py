@@ -15,7 +15,7 @@ from django.utils.translation import gettext as _
 from bimblog.models import (Building, BuildingPlan, PhotoStation, StationImage,
     Discipline, DisciplineNode)
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
-    BuildingDeleteForm, BuildingPlanCreateForm, DisciplineCreateForm,
+    BuildingDeleteForm, BuildingPlanCreateForm,
     DisciplineNodeCreateForm, DisciplineNodeUpdateForm)
 
 class MapMixin:
