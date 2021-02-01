@@ -1,6 +1,5 @@
 import json
 
-from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
@@ -345,7 +344,7 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
             self.object = DisciplineNode.add_root(
                 title=form.cleaned_data['title'],
                 intro=form.cleaned_data['intro'])
-        return HttpResponseRedirect(self.get_success_url())
+        return super(DisciplineListCreateView, self).form_valid(form)
 
     def get_success_url(self):
         if 'add_another' in self.request.POST:
