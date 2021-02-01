@@ -19,6 +19,7 @@ from .map_utils import workflow
 class DisciplineNode(MP_Node):
     parent = models.ForeignKey('self', verbose_name = _('Parent discipline'),
         null=True, blank=True,
+        help_text = _('Can be changed only by staff in admin'),
         on_delete = models.SET_NULL)
     title = models.CharField(_('Title'),
         help_text=_("Discipline name"),
