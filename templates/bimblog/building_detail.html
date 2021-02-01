@@ -22,12 +22,14 @@
     <p><em>{{ build.intro }}</em></p>
   </div>
   <div class="col col-md-4 text-right">
-    <a class="btn btn-secondary" href="#edit-features" title="{% translate "Modify features" %}">
+    <a class="btn btn-secondary" data-toggle="collapse" href="#map-container" title="{% translate "Modify features" %}">
       <i class="fa fa-pencil"></i></a>
   </div>
 </div>
-<div class="row" style="height: 800px; margin-bottom: 10px">
-  <div class="col" id="mapid"></div>
+<div class="collapse show" id="map-container">
+  <div class="row" style="height: 800px; margin-bottom: 10px">
+    <div class="col" id="mapid"></div>
+  </div>
 </div>
 <div class="row" id="edit-features">
   <div class="col-md-2"></div>
