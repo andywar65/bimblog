@@ -11,7 +11,7 @@
     <h4><strong>{% translate "List of disciplines" %}</strong></h4>
   </div>
   <div class="col col-md-4 text-right">
-    {% if perms.bimblog.add_discipline %}
+    {% if perms.bimblog.add_disciplinenode %}
       <a class="btn btn-secondary" href="#discipline-create" title="{% translate "Add discipline" %}">
         + <i class="fa fa-graduation-cap"></i></a>
     {% endif %}
@@ -37,6 +37,9 @@
     <tbody>
   </table>
 </div>
+{% if perms.bimblog.change_disciplinenode and user.is_staff %}
+<p><a href="/admin/bimblog/disciplinenode">{% trans "Modify tree" %}</a></p>
+{% endif %}
 {% else %}
 {% translate "There are no disciplines, please add one" %}.
 {% endif %}
@@ -45,7 +48,7 @@
   <div class="col-md-8">
     <hr class="mb-4">
     <h4><strong>{% translate "Add discipline" %}</strong></h4>
-    {% if perms.bimblog.add_discipline %}
+    {% if perms.bimblog.add_disciplinenode %}
     {% include "bimblog/includes/hello_formula.html" %}
     <hr class="mb-4">
     {% include "bimblog/includes/form_errors.html" %}
