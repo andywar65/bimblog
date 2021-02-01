@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, ModelChoiceField
 from django.utils.translation import gettext as _
 
 from .models import (Building, BuildingPlan, PhotoStation, StationImage,
@@ -63,8 +63,15 @@ class StationImageUpdateForm(ModelForm):
         model = StationImage
         fields = ( 'image', 'stat', 'date', 'caption')
 
+class NodeChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        prefix = ''
+        for i in range( obj.depth -1 ):
+            prefix = prefix + '-'
+        return prefix + obj.title
+
 class DisciplineNodeCreateForm(forms.Form):
-    parent = forms.ModelChoiceField( label=_('Parent discipline'),
+    parent = NodeChoiceField( label=_('Parent discipline'),
         queryset=DisciplineNode.objects.all(), required=False )
     title = forms.CharField( label=_('Title'),
         help_text=_("Discipline name"),
