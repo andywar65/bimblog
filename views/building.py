@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from bimblog.models import (Building, BuildingPlan, PhotoStation, StationImage,
-    Discipline, DisciplineNode)
+    DisciplineNode)
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
     BuildingDeleteForm, BuildingPlanCreateForm,
     DisciplineNodeCreateForm, DisciplineNodeUpdateForm)
