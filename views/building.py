@@ -13,9 +13,10 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from bimblog.models import (Building, BuildingPlan, PhotoStation, StationImage,
-    Discipline)
+    Discipline, DisciplineNode)
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
-    BuildingDeleteForm, BuildingPlanCreateForm, DisciplineCreateForm)
+    BuildingDeleteForm, BuildingPlanCreateForm, DisciplineCreateForm,
+    DisciplineNodeCreateForm)
 
 class MapMixin:
 
@@ -140,10 +141,10 @@ class BuildingDetailView(PermissionRequiredMixin, AlertMixin, MapMixin,
         #building data
         build = self.prepare_build_data( context['build'] )
         #plan data
-        disc_list = context['build'].disciplines.all().values_list('id',
+        disc_list = context['build'].disciplinesn.all().values_list('id',
             flat=True)
-        disc_plans = context['plans'].filter(Q(disc=None)|
-            Q(disc_id__in=disc_list))
+        disc_plans = context['plans'].filter(Q(discn=None)|
+            Q(discn_id__in=disc_list))
         plans = []
         for plan in disc_plans.reverse():
             plans.append(self.prepare_plan_data(plan))
