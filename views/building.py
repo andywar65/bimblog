@@ -16,7 +16,7 @@ from bimblog.models import (Building, BuildingPlan, PhotoStation, StationImage,
     Discipline, DisciplineNode)
 from bimblog.forms import ( BuildingCreateForm, BuildingUpdateForm,
     BuildingDeleteForm, BuildingPlanCreateForm, DisciplineCreateForm,
-    DisciplineNodeCreateForm)
+    DisciplineNodeCreateForm, DisciplineNodeUpdateForm)
 
 class MapMixin:
 
@@ -357,9 +357,9 @@ class DisciplineListCreateView( PermissionRequiredMixin, AlertMixin,
                 f'?disc_created={self.object.title}')
 
 class DisciplineUpdateView( PermissionRequiredMixin, UpdateView ):
-    model = Discipline
-    permission_required = 'bimblog.change_discipline'
-    form_class = DisciplineCreateForm
+    model = DisciplineNode
+    permission_required = 'bimblog.change_disciplinenode'
+    form_class = DisciplineNodeUpdateForm
     template_name = 'bimblog/discipline_form_update.html'
 
     def setup(self, request, *args, **kwargs):

@@ -79,3 +79,9 @@ class DisciplineNodeCreateForm(forms.Form):
         required=False, empty_value=None,
         help_text = _('Few words to describe the discipline'),
         max_length = 100)
+
+class DisciplineNodeUpdateForm(ModelForm):
+
+    class Meta:
+        model = DisciplineNode
+        fields = ('title', 'intro')
