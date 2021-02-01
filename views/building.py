@@ -383,7 +383,7 @@ class DisciplineUpdateView( PermissionRequiredMixin, UpdateView ):
                 f'?disc_modified={self.object.title}')
 
 class DisciplineDeleteView(PermissionRequiredMixin, FormView):
-    permission_required = 'bimblog.delete_discipline'
+    permission_required = 'bimblog.delete_disciplinenode'
     form_class = BuildingDeleteForm
     template_name = 'bimblog/discipline_form_delete.html'
 
@@ -391,7 +391,7 @@ class DisciplineDeleteView(PermissionRequiredMixin, FormView):
         super(DisciplineDeleteView, self).setup(request, *args, **kwargs)
         self.build = get_object_or_404( Building,
             slug = self.kwargs['slug'] )
-        self.disc = get_object_or_404( Discipline,
+        self.disc = get_object_or_404( DisciplineNode,
             id = self.kwargs['pk'] )
 
     def get_context_data(self, **kwargs):
