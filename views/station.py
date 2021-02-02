@@ -1,5 +1,3 @@
-import json
-
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView,
@@ -44,10 +42,11 @@ class PhotoStationCreateView( PermissionRequiredMixin, AlertMixin, MapMixin,
         plans = []
         for plan in self.build.building_plan.all().reverse():
             plans.append(self.prepare_plan_data(plan))
-        context['map_data'] = json.dumps({
+        context['map_data'] = {
             'build': build,
             'plans': plans,
-            'mapbox_token': settings.MAPBOX_TOKEN})
+            'mapbox_token': settings.MAPBOX_TOKEN
+            }
 
         return context
 
@@ -89,11 +88,12 @@ class PhotoStationUpdateView( PermissionRequiredMixin, MapMixin, UpdateView ):
             plans.append(self.prepare_plan_data(plan))
         #station data
         stat = self.prepare_stat_data( self.object )
-        context['map_data'] = json.dumps({
+        context['map_data'] = {
             'build': build,
             'plans': plans,
             'stat': stat,
-            'mapbox_token': settings.MAPBOX_TOKEN})
+            'mapbox_token': settings.MAPBOX_TOKEN
+            }
         return context
 
     def get_success_url(self):

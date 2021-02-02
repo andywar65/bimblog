@@ -80,5 +80,6 @@
 
 {% endblock content %}
 {% block extra-js %}
-{% include "bimblog/includes/js/building_detail_js.html" %}
+  {{ map_data|json_script:"map_data"}}
+  <script src="{% static 'bimblog/js/building_detail.js'%}"></script>
 {% endblock extra-js %}

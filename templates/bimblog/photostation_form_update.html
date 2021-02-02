@@ -46,5 +46,6 @@
 </div>
 {% endblock content %}
 {% block extra-js %}
- {% include 'bimblog/includes/js/photostation_form_update_js.html' %}
+  {{ map_data|json_script:"map_data"}}
+  <script src="{% static 'bimblog/js/photostation_form_update.js'%}"></script>
 {% endblock extra-js %}

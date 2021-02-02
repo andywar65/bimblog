@@ -1,5 +1,3 @@
-import json
-
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.conf import settings
@@ -162,13 +160,14 @@ class BuildingDetailView(PermissionRequiredMixin, AlertMixin, MapMixin,
         no_plan_status = False
         if context['stations'].filter(plan_id=None):
             no_plan_status = True
-        context['map_data'] = json.dumps({
+        context['map_data'] = {
             'build': build,
             'plans': plans,
             'stations': stations,
             'no_plan_status': no_plan_status,
             'no_plan_trans': _("No plan"),
-            'mapbox_token': settings.MAPBOX_TOKEN})
+            'mapbox_token': settings.MAPBOX_TOKEN
+            }
         return context
 
 class BuildingUpdateView(PermissionRequiredMixin, MapMixin, UpdateView):
@@ -182,9 +181,10 @@ class BuildingUpdateView(PermissionRequiredMixin, MapMixin, UpdateView):
         #we add the following to feed the map
         #building data
         build = self.prepare_build_data( self.object )
-        context['map_data'] = json.dumps({
+        context['map_data'] = {
             'build': build,
-            'mapbox_token': settings.MAPBOX_TOKEN})
+            'mapbox_token': settings.MAPBOX_TOKEN
+            }
         return context
 
     def get_success_url(self):
