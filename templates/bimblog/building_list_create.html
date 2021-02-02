@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% load fb_versions %}
 {% load i18n %}
-{% load l10n %}
+{% load static %}
 
 {% block title %}{{ website.acro }} | {% translate "Buildings" %}{% endblock title %}
 
@@ -14,7 +14,7 @@
 {% include "bimblog/includes/building_alerts.html" %}
 <div class="row">
   <div class="col col-md-8">
-    <h4><strong>{% translate "List of buildings" %}</strong></h4>
+    <h4><strong>{% translate "Map of all buildings" %}</strong></h4>
   </div>
   <div class="col col-md-4 text-right">
     {% if perms.bimblog.add_building %}
@@ -51,5 +51,6 @@
 </div>
 {% endblock content %}
 {% block extra-js %}
-  {% include "bimblog/includes/js/building_list_create_js.html" %}
+  {{ map_data|json_script:"map_data"}}
+  <script src="{% static 'bimblog/js/building_list_create.js'%}"></script>
 {% endblock extra-js %}

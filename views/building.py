@@ -99,11 +99,13 @@ class BuildingListCreateView( PermissionRequiredMixin, AlertMixin, MapMixin,
         builds = []
         for build in context['builds']:
             builds.append( self.prepare_build_data(build) )
-        context['map_data'] = json.dumps({'builds': builds,
+        context['map_data'] = {
+            'builds': builds,
             'city_lat': settings.CITY_LAT,
             'city_long': settings.CITY_LONG,
             'city_zoom': settings.CITY_ZOOM,
-            'mapbox_token': settings.MAPBOX_TOKEN})
+            'mapbox_token': settings.MAPBOX_TOKEN
+            }
         return context
 
     def form_valid(self, form):
