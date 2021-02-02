@@ -59,22 +59,25 @@ var content = "<h5><a href=\"" + map_data.build.path + "\">" +
 L.marker([ map_data.build.lat , map_data.build.long ], {icon: buildMarker})
   .addTo(mymap).bindPopup(content, {minWidth: 300});
 
-const statMarker = L.divIcon({
-  html: '<i class="fa fa-camera fa-2x" style="color: red;"></i>',
-  iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
-  className: 'stat-marker'
-});
+if (map_data.hasOwnProperty('stat')){
+  const statMarker = L.divIcon({
+    html: '<i class="fa fa-camera fa-2x" style="color: red;"></i>',
+    iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -18],
+    className: 'stat-marker'
+  });
 
-if (map_data.stat.fb_path){
-  var content = "<h5>" + map_data.stat.title +
-    "</h5><img src=\"" + map_data.stat.fb_path + "\"><br><small>" +
-      map_data.stat.intro + "</small>";
-} else {
-  var content = "<h5>" + map_data.stat.title +
-    "</h5><br><small>" + map_data.stat.intro + "</small>";
+  if (map_data.stat.fb_path){
+    var content = "<h5>" + map_data.stat.title +
+      "</h5><img src=\"" + map_data.stat.fb_path + "\"><br><small>" +
+        map_data.stat.intro + "</small>";
+  } else {
+    var content = "<h5>" + map_data.stat.title +
+      "</h5><br><small>" + map_data.stat.intro + "</small>";
+  }
+  L.marker([map_data.stat.lat, map_data.stat.long ], {icon: statMarker})
+    .addTo(mymap).bindPopup( content, {minWidth: 300});
 }
-L.marker([map_data.stat.lat, map_data.stat.long ], {icon: statMarker})
-  .addTo(mymap).bindPopup( content, {minWidth: 300});
+
 
 var baseMaps = {
   "Base": base_map
