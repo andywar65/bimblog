@@ -5,10 +5,10 @@
 {% block title %}{{ website.acro }} | {% translate "Disciplines" %}{% endblock title %}
 
 {% block content %}
-{% include "bimblog/includes/discipline_alerts.html" %}
 <div class="row">
   <div class="col-md-2"></div>
   <div class="col-md-8">
+    {% include "bimblog/includes/discipline_alerts.html" %}
     <div class="row">
       <div class="col">
         <h4><strong>{% translate "List of disciplines" %}</strong></h4>

@@ -86,13 +86,15 @@ class NodeChoiceField(ModelChoiceField):
 class DisciplineNodeCreateForm(ModelForm):
     parent = NodeChoiceField( label=_('Parent discipline'),
         queryset=DisciplineNode.objects.all(), required=False,
-        help_text = _('Can be changed only by staff in admin'))
+        help_text = _('Choose carefully: can be changed only by staff in admin'))
     class Meta:
         model = DisciplineNode
         fields = ('parent', 'title', 'intro')
 
 class DisciplineNodeUpdateForm(ModelForm):
-
+    parent = NodeChoiceField( label=_('Parent discipline'),
+        queryset=DisciplineNode.objects.all(), disabled = True,
+        help_text = _('Can be changed only by staff in admin'))
     class Meta:
         model = DisciplineNode
-        fields = ('title', 'intro')
+        fields = ('parent', 'title', 'intro')
